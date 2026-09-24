@@ -190,3 +190,23 @@ def test_session_start_delivers_rules_and_flags_a_missing_cli():
     missing = module.build_output("Rule one.", installed=False)
     assert "pip install aegis-sdlc" in missing["systemMessage"]
     assert "pip install aegis-sdlc" in missing["hookSpecificOutput"]["additionalContext"]
+
+
+def test_session_start_injects_every_golden_rule_within_the_context_budget():
+    """Claude Code previews oversized hook context; the rules must arrive in full."""
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, str(PLUGIN / "scripts/session_start.py")], input="{}", text=True, capture_output=True, check=True
+    )
+    context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
+    spec = importlib.util.spec_from_file_location("session_start_budget", PLUGIN / "scripts/session_start.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    assert len(context) < module.CONTEXT_BUDGET, len(context)
+    rules = (REPO_ROOT / "aegis/instructions.md").read_text(encoding="utf-8")
+    numbered = re.findall(r"(?m)^(\d+)\. \*\*", rules[rules.index("## Golden rules"):rules.index("## The artifacts")])
+    assert len(numbered) >= 10
+    for number in numbered:
+        assert f"\n{number}. **" in context, f"golden rule {number} missing"
+    assert "instructions.md" in context  # pointer to the full reference
