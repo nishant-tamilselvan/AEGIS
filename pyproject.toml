@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aegis-sdlc"
-version = "0.1.0"
+version = "0.1.1"
 description = "CLI for AEGIS: scaffold, validate and track requirements, architecture artifacts, ADRs and implementation work packages."
 readme = "docs/package-readme.md"
 requires-python = ">=3.10"

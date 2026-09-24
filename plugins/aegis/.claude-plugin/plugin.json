@@ -1,6 +1,6 @@
 {
   "name": "aegis",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Agents that turn an idea into approved requirements, an implementable architecture and reviewed code, grounded in your enterprise standards.",
   "author": {
     "name": "Nishant Tamilselvan"

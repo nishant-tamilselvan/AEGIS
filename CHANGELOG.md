@@ -7,6 +7,10 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-24
+
+The first release on PyPI (`pip install aegis-sdlc`), and the Claude Code plugin.
+
 ### Added
 
 - The CLI is packaged for PyPI as `aegis-sdlc` (the `artifact-tools` command and the
@@ -107,5 +111,6 @@ First public, organization-neutral release, for GitHub Copilot and Claude Code.
 - The CLI writes LF line endings on every platform. On Windows, scaffolded artifacts,
   ADRs, changelog entries and contract stubs were written with CRLF.
 
-[Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/nishant-tamilselvan/AEGIS/releases/tag/v0.1.0
