@@ -1,0 +1,14 @@
+# Normalize line endings so agent, skill and template files diff cleanly across
+# Windows, macOS and Linux.
+* text=auto eol=lf
+
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
