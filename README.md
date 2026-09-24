@@ -22,6 +22,7 @@
 </p>
 
 <p align="center">
+  <a href="https://nishant-tamilselvan.github.io/AEGIS/"><strong>Documentation site</strong></a> ·
   <a href="docs/getting-started.md">Getting started</a> ·
   <a href="docs/claude-code.md">Claude Code</a> ·
   <a href="docs/how-it-works.md">How it works</a> ·

@@ -7,6 +7,12 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+### Added
+
+- A documentation site at <https://nishant-tamilselvan.github.io/AEGIS/>, built from
+  `docs/` with MkDocs (pinned to 1.x) and published by GitHub Pages. CI builds it in
+  strict mode, so broken links fail the pull request.
+
 ### Security
 
 - An implementation agent could write files **outside the target repository**, for

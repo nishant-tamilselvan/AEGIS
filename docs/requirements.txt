@@ -1,0 +1,3 @@
+# Pinned versions for the documentation site (mkdocs.yml, .github/workflows/pages.yml).
+mkdocs==1.6.1
+mkdocs-material==9.7.7
