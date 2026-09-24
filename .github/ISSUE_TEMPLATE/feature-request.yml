@@ -31,6 +31,7 @@ body:
         - Both GitHub Copilot and Claude Code
         - GitHub Copilot (VS Code) only
         - Claude Code only
+        - The Claude Code plugin only
         - Not host-specific (CLI, templates, docs)
     validations:
       required: true

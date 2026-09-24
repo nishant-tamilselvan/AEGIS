@@ -22,6 +22,7 @@ ruff check .                            # lint Python
 python scripts/sync_platforms.py        # regenerate Copilot and Claude Code files from aegis/
 python scripts/ci/repo_checks.py all    # repository hygiene checks
 pre-commit run --all-files              # everything CI runs, including Markdown lint and gitleaks
+claude plugin validate --strict plugins/aegis   # plugin check CI also runs (needs Claude Code)
 ```
 
 Run `sync_platforms.py`, the tests and `repo_checks.py all` before you finish any change.

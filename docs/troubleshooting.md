@@ -5,7 +5,7 @@
 | Symptom | Fix |
 | --- | --- |
 | **Copilot:** AEGIS agents or slash commands do not appear in Copilot Chat. | Open the repository root as the VS Code workspace, not a subfolder. Switch Copilot Chat to Agent mode. Update VS Code and Copilot Chat if the agent picker is missing. |
-| `No module named artifact_tools` | Run `pip install -e .` in the active environment, or set `PYTHONPATH=src`. |
+| `No module named artifact_tools` | In a clone, run `pip install -e .` in the active environment, or set `PYTHONPATH=src`. Anywhere else, including with the plugin, run `pip install aegis-sdlc`. |
 | `python` is not found on Windows. | Use `py -3` or install Python from python.org with "Add to PATH" selected. |
 | Hooks do not run. | Hooks are configured in `.github/hooks/validate-artifacts.json` (Copilot) and `.claude/settings.json` (Claude Code), and call `python`. Make sure `python` on your PATH has PyYAML installed. |
 | Agents say "Enterprise Standards MCP unavailable". | See [Enterprise Standards troubleshooting](enterprise-standards-setup.md#troubleshooting). |
@@ -59,6 +59,8 @@ The guard runs before every tool call from an implementation agent.
 | "Deployment requires an explicitly approved release gate." | Expected. Deployment needs the release gate and a person's approval. |
 
 ## Claude Code
+
+Using the plugin? See also the [plugin troubleshooting](claude-code-plugin.md#troubleshooting).
 
 | Symptom | Fix |
 | --- | --- |

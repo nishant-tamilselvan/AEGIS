@@ -44,8 +44,14 @@ In scope:
   outside its active work package's declared target paths, write under `docs/artifacts/`,
   or run a destructive or deployment command without the human gate
   (`scripts/implementation_guard.py`, `src/artifact_tools/guard.py`, and the hook
-  configuration in `.github/hooks/` and `.claude/settings.json`). This includes any
-  GitHub Copilot or Claude Code tool that edits files without the guard seeing it.
+  configuration in `.github/hooks/`, `.claude/settings.json` and the plugin's
+  `plugins/aegis/hooks/hooks.json`). This includes any GitHub Copilot or Claude Code tool
+  that edits files without the guard seeing it, and any way to make the plugin's hooks
+  guard the wrong repository.
+- **The published packages:** the [`aegis-sdlc` package on PyPI](https://pypi.org/project/aegis-sdlc/)
+  and the [Claude Code plugin](docs/claude-code-plugin.md), including the plugin's
+  vendored copy of the guard. Releases are published from GitHub Actions through PyPI
+  Trusted Publishing, with a provenance attestation and maintainer approval.
 - **Prompt injection through repository content.** Agent, prompt, skill or template
   text that makes an agent ignore its rules, leak data or take unapproved actions.
 - **Prompt injection through the Enterprise Standards library.** Standards content
@@ -71,9 +77,11 @@ Know these limits before you rely on AEGIS:
 - **The implementation guard is a safeguard, not a sandbox.** It checks the tool calls
   the agent host reports to it, and it never fails open: if it breaks, implementation
   agents are denied and every other call becomes an approval prompt. Only the active
-  package's implementer may write to the target repository. It cannot see tools the host does not route
-  through the hook, or hooks you have disabled. Review every change an agent makes before
-  you merge it.
+  package's implementer may write to the target repository. It cannot see tools the host
+  does not route through the hook, or hooks you have disabled. In Claude Code, project
+  and plugin hooks run only once you trust the folder (see
+  [Using AEGIS with Claude Code](docs/claude-code.md#verify-the-guard-once)). Review every
+  change an agent makes before you merge it.
 - **Standards content is untrusted input.** Agents treat documents returned by
   `enterprise-standards-server` as data and never as instructions. Only connect libraries
   your organization controls.

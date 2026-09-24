@@ -7,6 +7,13 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+### Changed
+
+- CI tests a reduced matrix on each run (all Pythons on Linux, 3.10 and 3.13 on Windows,
+  3.13 on macOS); the full 12-combination matrix runs weekly and on demand.
+- The README, guides, security policy and issue forms cover the Claude Code plugin and
+  the `aegis-sdlc` package.
+
 ## [0.1.1] - 2026-09-24
 
 The first release on PyPI (`pip install aegis-sdlc`), and the Claude Code plugin.

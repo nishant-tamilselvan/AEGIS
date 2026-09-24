@@ -60,7 +60,19 @@ python -m pytest                        # tests (CI: Linux, Windows and macOS; f
 ruff check .                            # Python lint
 python scripts/ci/repo_checks.py all    # personal paths, denylist, unicode, workflows, links
 pre-commit run --all-files              # all of the above plus Markdown lint and gitleaks
+claude plugin validate --strict plugins/aegis   # optional; needs Claude Code
 ```
+
+Pull requests need these checks to pass before they can merge:
+
+| Check | What it runs |
+| --- | --- |
+| Test (7 jobs) | pytest on Linux with Python 3.10–3.13, Windows with 3.10 and 3.13, and macOS with 3.13. All 12 combinations run weekly in `full-matrix.yml`. |
+| Lint and repository checks | ruff, the generated-file drift check, `repo_checks.py`, the sample knowledge base and Markdown lint |
+| Build package | Builds the sdist and wheel, then runs the installed CLI outside the repository |
+| Validate Claude Code plugin | `claude plugin validate --strict` on the marketplace, plugin, skills and agents |
+| Secret scan | gitleaks over the full history |
+| Analyze (python), Analyze (actions) | CodeQL. Every review comment it leaves must be resolved, preferably by fixing the code. |
 
 `repo_checks.py` enforces these rules:
 
@@ -183,10 +195,18 @@ Maintainers release from `main`:
 1. Open a pull request that sets `version` in `pyproject.toml` to the new version and
    renames the changelog's **Unreleased** section to `[X.Y.Z] - YYYY-MM-DD`, with a
    new empty **Unreleased** section above it and updated comparison links at the bottom.
+   Run `python scripts/sync_platforms.py`: the plugin manifest takes its version from
+   `pyproject.toml`.
 2. Merge it once CI passes.
 3. Publish a GitHub release with the tag `vX.Y.Z` on that commit, using the changelog
    section as the notes.
+4. Approve the deployment: open the **Publish to PyPI** run, select **Review
+   deployments**, tick `pypi` and approve.
+5. Check the result: `pip install aegis-sdlc==X.Y.Z` in a clean environment, and run
+   `artifact-tools validate` on a scaffolded folder outside the repository.
 
 Publishing the release runs `.github/workflows/publish.yml`. It checks that the tag
 matches the package version, builds the sdist and wheel, and publishes `aegis-sdlc` to
-PyPI through Trusted Publishing, so no API token is stored.
+PyPI through Trusted Publishing, so no API token is stored. PyPI records a provenance
+attestation that links each file to this repository and workflow. Only `v*` tags can
+deploy to the `pypi` environment, and each deployment needs a maintainer's approval.

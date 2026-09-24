@@ -25,6 +25,14 @@ Check the tooling works:
 python -m artifact_tools --help
 ```
 
+This guide uses a clone of AEGIS. Two other options:
+
+- **Claude Code plugin (preview):** install AEGIS into your own repository instead. See
+  [AEGIS as a Claude Code plugin](claude-code-plugin.md); commands then carry an `aegis:`
+  prefix, such as `/aegis:start-ideation`.
+- **CLI only:** `pip install aegis-sdlc` installs the `artifact-tools` command without the
+  agents, for example for CI. See the [CLI reference](cli-reference.md#install-on-its-own).
+
 ## 2. Open the workspace
 
 **GitHub Copilot:** open the `AEGIS` folder in VS Code. Copilot Chat picks up the

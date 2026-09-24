@@ -143,11 +143,14 @@ the implementation tooling:
 
 `aegis/` is the single source for agents, prompts, skills and these rules.
 `python scripts/sync_platforms.py` generates the GitHub Copilot files (`.github/agents/`,
-`.github/prompts/`, `.github/skills/`, `.github/copilot-instructions.md`) and the Claude
-Code files (`.claude/agents/`, `.claude/skills/`). Never edit the generated copies.
+`.github/prompts/`, `.github/skills/`, `.github/copilot-instructions.md`), the Claude
+Code files (`.claude/agents/`, `.claude/skills/`) and the Claude Code plugin
+(`plugins/aegis/`, `.claude-plugin/marketplace.json`). Never edit the generated copies.
 
 In Claude Code, orchestrators run in the main conversation through the prompt skills
-(`/start-ideation` and the others), and specialists run as subagents.
+(`/start-ideation` and the others), and specialists run as subagents. In the plugin the
+same commands and subagents carry an `aegis:` prefix (`/aegis:start-ideation`,
+`aegis:artifact-manager`), and the CLI comes from `pip install aegis-sdlc`.
 
 ## Tooling
 
