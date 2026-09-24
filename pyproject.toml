@@ -1,12 +1,12 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
-name = "artifact-tools"
+name = "aegis-sdlc"
 version = "0.1.0"
-description = "Deterministic tooling for AEGIS ideation, architecture, and evidence-backed implementation phases."
-readme = "README.md"
+description = "CLI for AEGIS: scaffold, validate and track requirements, architecture artifacts, ADRs and implementation work packages."
+readme = "docs/package-readme.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Nishant Tamilselvan" }]
@@ -50,6 +50,24 @@ artifact-tools = "artifact_tools.__main__:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/artifact_tools"]
+
+# Bundle the templates so an installed CLI works outside this repository. A repository's
+# own aegis/skills templates still take precedence (see find_templates_dir).
+[tool.hatch.build.targets.wheel.force-include]
+"aegis/skills/artifact-management/assets/templates" = "artifact_tools/templates/artifact"
+"aegis/skills/implementation-management/assets/templates" = "artifact_tools/templates/implementation"
+
+[tool.hatch.build.targets.sdist]
+# Patterns are gitignore-style; a leading "/" anchors them to the repository root.
+include = [
+    "/src/artifact_tools",
+    "/aegis/skills/artifact-management/assets/templates",
+    "/aegis/skills/implementation-management/assets/templates",
+    "/docs/package-readme.md",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

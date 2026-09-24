@@ -58,14 +58,33 @@ def render_document(frontmatter: dict, body: str) -> str:
     return f"---\n{dumped}\n---\n{body}"
 
 
+def packaged_templates_dir(kind: str) -> Path | None:
+    """Templates bundled in an installed wheel (``artifact`` or ``implementation``)."""
+    from importlib.resources import files
+
+    try:
+        target = Path(str(files("artifact_tools") / "templates" / kind))
+    except (ModuleNotFoundError, TypeError):
+        return None
+    return target if target.is_dir() else None
+
+
 def find_templates_dir(start: Path | None = None) -> Path:
-    """Locate the artifact templates directory by walking up from `start`."""
+    """Locate the artifact templates directory.
+
+    A repository's own ``aegis/skills`` templates win, found by walking up from `start`,
+    so customized templates are used. Otherwise the copies bundled with an installed
+    package are used.
+    """
     rel = Path("aegis/skills/artifact-management/assets/templates")
     current = (start or Path.cwd()).resolve()
     for candidate in (current, *current.parents):
         target = candidate / rel
         if target.is_dir():
             return target
+    packaged = packaged_templates_dir("artifact")
+    if packaged is not None:
+        return packaged
     raise FileNotFoundError(
         f"Could not locate templates directory ({rel}) from {current}."
     )
