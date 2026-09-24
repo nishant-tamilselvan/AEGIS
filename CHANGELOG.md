@@ -54,10 +54,13 @@ First public, organization-neutral release, for GitHub Copilot and Claude Code.
 
 ### Security
 
-- The implementation guard hook fails closed. An agent host lets a tool call proceed when
-  its hook crashes, so the wrapper asks you when it cannot load the guard or read the
-  payload, and denies when the guard raises. Deny reasons also go to stderr, where Claude
-  Code reads them.
+- The implementation guard hook never fails open. An agent host lets a tool call proceed
+  when its hook crashes, so on any failure the wrapper denies implementation agents and
+  asks you about every other call. Deny reasons also go to stderr, where Claude Code reads
+  them.
+- Only the active work package's implementation agent may write to the target
+  repository. Writes there from orchestrators, reviewers or the Claude Code main
+  conversation are denied with a reminder to delegate.
 
 ### Fixed
 

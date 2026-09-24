@@ -235,12 +235,28 @@ def test_claude_bash_gates(tmp_path: Path):
     assert redirect.permission == "deny"
 
 
-def test_claude_main_session_and_other_subagents_are_unaffected(tmp_path: Path):
-    _, target, root = _guard_fixture(tmp_path)
-    main_session = evaluate_guard(_claude_payload(None, "Write", file_path=str(target / "anything.py")), repo_root=root)
-    reviewer = evaluate_guard(_claude_payload("critic-reviewer", "Bash", command="python -m pytest"), repo_root=root)
-    assert main_session.permission == "allow"
-    assert reviewer.permission == "allow"
+def test_only_implementers_may_write_to_the_target_repository(tmp_path: Path):
+    app, target, root = _guard_fixture(tmp_path)
+    inside_package = str(target / "apps/sample/src/app.py")
+    main_session = evaluate_guard(_claude_payload(None, "Write", file_path=inside_package), repo_root=root)
+    orchestrator = evaluate_guard(
+        _payload("Implementation Orchestrator", "create_file", filePath=inside_package), repo_root=root
+    )
+    reviewer = evaluate_guard(_claude_payload("implementation-reviewer", "Edit", file_path=inside_package), repo_root=root)
+    for decision in (main_session, orchestrator, reviewer):
+        assert decision.permission == "deny"
+        assert "delegate" in decision.reason
+
+
+def test_other_agents_keep_reads_commands_and_non_target_writes(tmp_path: Path):
+    app, target, root = _guard_fixture(tmp_path)
+    decisions = [
+        evaluate_guard(_claude_payload(None, "Read", file_path=str(target / "apps/sample/src/app.py")), repo_root=root),
+        evaluate_guard(_claude_payload("critic-reviewer", "Bash", command="python -m pytest"), repo_root=root),
+        evaluate_guard(_claude_payload("artifact-manager", "Write", file_path=str(app / "product-requirements.md")), repo_root=root),
+        evaluate_guard(_claude_payload(None, "Write", file_path=str(root / "notes.md")), repo_root=root),
+    ]
+    assert [d.permission for d in decisions] == ["allow"] * 4
 
 
 def test_hook_wrapper_accepts_claude_payload():
@@ -317,12 +333,40 @@ def test_wrapper_denies_when_the_guard_raises(monkeypatch, capsys):
     assert "denying to stay safe" in err
 
 
-def test_wrapper_asks_when_the_guard_cannot_be_imported(monkeypatch, capsys):
+def test_wrapper_asks_others_when_the_guard_raises(monkeypatch, capsys):
+    """A broken guard must not lock a person out of their own session."""
+    import artifact_tools.guard as guard
+
+    def broken(payload, *, repo_root):
+        raise NameError("name 'helper' is not defined")
+
+    monkeypatch.setattr(guard, "evaluate_guard", broken)
+    for agent in (None, "critic-reviewer"):
+        code, output, _ = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload(agent, "Edit", file_path="x")))
+        assert output["permissionDecision"] == "ask", agent
+        assert code == 0
+
+
+def test_wrapper_when_the_guard_cannot_be_imported(monkeypatch, capsys):
     monkeypatch.setitem(sys.modules, "artifact_tools.guard", None)
     code, output, _ = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload("service-implementer", "Write", file_path="x")))
-    assert output["permissionDecision"] == "ask"
+    assert output["permissionDecision"] == "deny"
     assert "unavailable" in output["permissionDecisionReason"]
+    assert code == 2
+    code, output, _ = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload(None, "Write", file_path="x")))
+    assert output["permissionDecision"] == "ask"
     assert code == 0
+
+
+def test_wrapper_agent_list_matches_guard():
+    from artifact_tools.guard import IMPLEMENTATION_CODE_AGENTS
+
+    wrapper = _load_guard_wrapper()
+    assert wrapper.IMPLEMENTATION_CODE_AGENTS == IMPLEMENTATION_CODE_AGENTS
+    assert wrapper.is_code_agent({"agentName": "Service Implementer"})
+    assert wrapper.is_code_agent({"agent_type": "ui-implementer"})
+    assert not wrapper.is_code_agent({"agent_type": "critic-reviewer"})
+    assert not wrapper.is_code_agent({})
 
 
 def test_wrapper_reports_deny_reason_on_stderr(tmp_path: Path, monkeypatch, capsys):
