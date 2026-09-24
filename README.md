@@ -72,7 +72,8 @@ Other ways to get AEGIS:
 - **CLI only:** `pip install aegis-sdlc` gives you the `artifact-tools` command, for
   example to validate artifacts in CI. See the [CLI reference](docs/cli-reference.md).
 
-Start with the same command on either platform:
+Start with the same command in Copilot or a Claude Code clone (the plugin uses
+`/aegis:start-ideation`):
 
 ```text
 /start-ideation customer-portal A self-service portal where customers track orders
@@ -116,9 +117,9 @@ implementation.
 | --- | --- |
 | **18 agents** | 3 orchestrators and 15 specialists across the three phases. [Catalog](docs/agents.md). |
 | **10 prompts** | Slash commands to start, resume, review and change each phase. [List](docs/agents.md#prompts). |
-| **2 platforms, 1 source** | Everything is written once in `aegis/` and generated for GitHub Copilot (`.github/`), Claude Code (`.claude/`) and the Claude Code plugin (`plugins/aegis/`). |
+| **2 hosts, 3 setups, 1 source** | Everything is written once in `aegis/` and generated for GitHub Copilot (`.github/`), Claude Code (`.claude/`) and the Claude Code plugin (`plugins/aegis/`). |
 | **4 skills** | Artifact, ADR and implementation management, and Enterprise Standards grounding. |
-| **Hooks** | A guard before implementation tool calls, and validation after every edit, on both platforms. The plugin adds a session-start hook that loads the golden rules. |
+| **Hooks** | A guard before implementation tool calls, and validation after every edit, in every setup. The plugin adds a session-start hook that loads the golden rules. |
 | **`artifact_tools` CLI** | Scaffold, validate, ADRs, contracts, diagrams and implementation state. On PyPI as [`aegis-sdlc`](https://pypi.org/project/aegis-sdlc/). [Reference](docs/cli-reference.md). |
 | **Reference MCP server** | Serves your standards from Markdown files. [Setup](docs/enterprise-standards-setup.md). |
 

@@ -69,9 +69,9 @@ folder under `docs/artifacts/` (e.g. `docs/artifacts/customer-portal/`) holding 
 full artifact set, its own `architecture-decisions/`, and its own `interfaces/` store.
 The bare `docs/artifacts/` root holds only `README.md`, the applications index.
 
-- The **active application** is chosen at session start (a `/start-ideation`,
-  `/start-architecture`, `/add-requirement`, `/add-adr`, or `/run-review-cycle`
-  argument). The orchestrator resolves it to `docs/artifacts/<app-name>` and threads that
+- The **active application** is chosen at session start, from the first argument of
+  any AEGIS prompt (`/start-ideation`, `/start-architecture`, `/start-implementation`
+  and the others). The orchestrator resolves it to `docs/artifacts/<app-name>` and threads that
   path through every handoff. All tooling commands target that per-app directory.
 - Requirement IDs (`PR-`, `FR-`, `NFR-`, `ADR-`, …) are unique **within** an application;
   the same id may appear independently in a different app.

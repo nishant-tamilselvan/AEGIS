@@ -31,7 +31,7 @@
 ## Checklist
 
 - [ ] Followed the [component checklist](https://github.com/nishant-tamilselvan/AEGIS/blob/main/CONTRIBUTING.md#component-checklists) for any agent, prompt, skill, template, CLI or workflow I changed.
-- [ ] Changed agents, prompts, skills or golden rules in `aegis/`, not in the generated `.github/` or `.claude/` copies.
+- [ ] Changed agents, prompts, skills or golden rules in `aegis/`, not in the generated `.github/`, `.claude/` or `plugins/aegis/` copies.
 - [ ] No secrets, internal hostnames, organization names or personal paths.
 - [ ] Docs updated (`README.md`, `docs/`), if behavior or usage changed.
 - [ ] `CHANGELOG.md` updated under **Unreleased**, if users will notice the change.

@@ -59,7 +59,7 @@ python scripts/sync_platforms.py        # regenerate Copilot and Claude Code fil
 python -m pytest                        # tests (CI: Linux, Windows and macOS; full matrix weekly)
 ruff check .                            # Python lint
 python scripts/ci/repo_checks.py all    # personal paths, denylist, unicode, workflows, links
-pre-commit run --all-files              # all of the above plus Markdown lint and gitleaks
+pre-commit run --all-files              # sync check, ruff, repo checks, Markdown lint, gitleaks (not pytest)
 claude plugin validate --strict plugins/aegis   # optional; needs Claude Code
 ```
 
@@ -98,7 +98,7 @@ If you work on AEGIS for an organization, list that organization's private terms
 | `.github/agents/`, `.github/prompts/`, `.github/skills/`, `.github/copilot-instructions.md` | Generated for GitHub Copilot. Do not edit. |
 | `.claude/agents/`, `.claude/skills/` | Generated for Claude Code. Do not edit. |
 | `plugins/aegis/`, `.claude-plugin/marketplace.json` | Generated Claude Code plugin and marketplace, including copies of the hook scripts and `artifact_tools`. Do not edit. |
-| `.github/hooks/`, `.claude/settings.json` | Hook configuration for each platform. Both call the same scripts. |
+| `.github/hooks/`, `.claude/settings.json`, `plugins/aegis/hooks/hooks.json` | Hook configuration for Copilot, a Claude Code clone and the plugin. All call the same scripts. |
 | `CLAUDE.md` | Claude Code entry point. Imports the golden rules and `AGENTS.md`. |
 | `src/artifact_tools/` | The CLI: scaffold, validate, ADRs, implementation state and the guard. |
 | `scripts/` | Hook entry points and CI checks. |
@@ -109,8 +109,8 @@ If you work on AEGIS for an organization, list that organization's private terms
 ## Component checklists
 
 Agents, prompts and skills are written once in `aegis/`. After any change there, run
-`python scripts/sync_platforms.py` and commit the regenerated `.github/` and `.claude/`
-files with it. CI runs `sync_platforms.py --check` and fails if they are out of date.
+`python scripts/sync_platforms.py` and commit the regenerated `.github/`, `.claude/`,
+`plugins/aegis/` and `.claude-plugin/` files with it. CI runs `sync_platforms.py --check` and fails if they are out of date.
 
 Agent source frontmatter uses platform-neutral fields. The generator maps them for each
 platform:

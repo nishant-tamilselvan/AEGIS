@@ -76,7 +76,8 @@ Know these limits before you rely on AEGIS:
 
 - **The implementation guard is a safeguard, not a sandbox.** It checks the tool calls
   the agent host reports to it, and it never fails open: if it breaks, implementation
-  agents are denied and every other call becomes an approval prompt. Only the active
+  agents are denied and every other call becomes an approval prompt (so does every call
+  whose hook payload cannot be read). Only the active
   package's implementer may write to the target repository. It cannot see tools the host
   does not route through the hook, or hooks you have disabled. In Claude Code, project
   and plugin hooks run only once you trust the folder (see

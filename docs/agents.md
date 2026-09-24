@@ -3,7 +3,8 @@
 ## Agents
 
 Agents are written once in [`aegis/agents/`](../aegis/agents/) and generated for GitHub
-Copilot (`.github/agents/`) and Claude Code (`.claude/agents/`). Orchestrators talk to
+Copilot (`.github/agents/`), Claude Code (`.claude/agents/`) and the Claude Code plugin
+(`plugins/aegis/agents/`). Orchestrators talk to
 you. Specialists do focused work and report back to their orchestrator. In Claude Code,
 orchestrators run in the main conversation and specialists run as subagents; see
 [Using AEGIS with Claude Code](claude-code.md). In the
@@ -68,7 +69,7 @@ Copilot Chat and Claude Code. Most take the application name as their first argu
 
 ## Skills
 
-Skills are written in [`aegis/skills/`](../aegis/skills/) and copied to both platforms.
+Skills are written in [`aegis/skills/`](../aegis/skills/) and copied to all three setups.
 Agents load them when a task needs them.
 
 | Skill | Covers |

@@ -35,8 +35,9 @@ With a library connected, every phase follows the same routine:
 4. It asks you only about what the standards leave open.
 
 The [`enterprise-standards` skill](../aegis/skills/enterprise-standards/SKILL.md) holds the
-exact queries each agent runs. All agents reach the library through the tool reference
-`enterprise-standards-server/*` in their frontmatter.
+exact queries each agent runs. Agents that use the library list the `standards` tool in their `aegis/agents/` source,
+which becomes `enterprise-standards-server/*` for Copilot and
+`mcp__enterprise-standards-server` for Claude Code.
 
 ## Choose a setup option
 
@@ -290,9 +291,9 @@ Plugin users have no AEGIS clone to run the reference server from. Use your orga
 shared server over HTTP, or clone AEGIS once and point `command` and `args` at its
 `examples/enterprise-standards-server/server.py` with absolute paths.
 
-In both, keep the server name exactly `enterprise-standards-server`. The agents refer to
+In every setup, keep the server name exactly `enterprise-standards-server`. The agents refer to
 it by that name: `enterprise-standards-server/*` in Copilot and
-`mcp__enterprise-standards-server` in Claude Code.
+`mcp__enterprise-standards-server` in Claude Code and the plugin.
 
 ### GitHub Copilot (VS Code)
 
@@ -524,8 +525,8 @@ Until then, readiness reports the `standards-review` finding and blocks code gen
 This stops unreviewed designs reaching code by accident.
 
 If you do not use a library at all, you can also remove `standards` from the `tools:`
-lists in `aegis/agents/*.md` and run `python scripts/sync_platforms.py`. Agents on both
-platforms then stop trying to call it.
+lists in `aegis/agents/*.md` and run `python scripts/sync_platforms.py`. Agents in every
+setup then stop trying to call it.
 
 ## Security
 
