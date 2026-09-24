@@ -320,12 +320,10 @@ def test_wrapper_asks_when_payload_is_unreadable(monkeypatch, capsys):
 
 
 def test_wrapper_denies_when_the_guard_raises(monkeypatch, capsys):
-    import artifact_tools.guard as guard
-
     def broken(payload, *, repo_root):
         raise RuntimeError("corrupt implementation state")
 
-    monkeypatch.setattr(guard, "evaluate_guard", broken)
+    monkeypatch.setattr("artifact_tools.guard.evaluate_guard", broken)
     code, output, err = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload("service-implementer", "Write", file_path="x")))
     assert output["permissionDecision"] == "deny"
     assert "corrupt implementation state" in output["permissionDecisionReason"]
@@ -335,12 +333,11 @@ def test_wrapper_denies_when_the_guard_raises(monkeypatch, capsys):
 
 def test_wrapper_asks_others_when_the_guard_raises(monkeypatch, capsys):
     """A broken guard must not lock a person out of their own session."""
-    import artifact_tools.guard as guard
 
     def broken(payload, *, repo_root):
         raise NameError("name 'helper' is not defined")
 
-    monkeypatch.setattr(guard, "evaluate_guard", broken)
+    monkeypatch.setattr("artifact_tools.guard.evaluate_guard", broken)
     for agent in (None, "critic-reviewer"):
         code, output, _ = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload(agent, "Edit", file_path="x")))
         assert output["permissionDecision"] == "ask", agent
