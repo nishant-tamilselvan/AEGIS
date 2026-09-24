@@ -417,3 +417,53 @@ def test_same_repo_target_still_bounds_code_and_implementers(tmp_path: Path):
     assert implementer_code.permission == "allow"
     assert implementer_outside.permission == "deny"
     assert implementer_artifact.permission == "deny"
+
+
+# --------------------------------------------------------------------------- --repo-root (plugin layout)
+
+
+def _run_script(script: str, payload: dict, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts" / script), *args],
+        input=json.dumps(payload), text=True, capture_output=True, check=False, cwd=REPO_ROOT,
+    )
+
+
+def test_guard_script_guards_the_repository_given_by_repo_root(tmp_path: Path):
+    """A plugin runs the guard from its own folder against the user's repository."""
+    root = tmp_path.resolve()
+    _same_repo_fixture(root)
+    outside = _claude_payload("service-implementer", "Write", file_path=str(root / "README.md"))
+    inside = _claude_payload("service-implementer", "Write", file_path=str(root / "apps/sample/src/app.py"))
+    for args in (("--repo-root", str(root)), (f"--repo-root={root}",)):
+        denied = _run_script("implementation_guard.py", outside, *args)
+        allowed = _run_script("implementation_guard.py", inside, *args)
+        assert json.loads(denied.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny", args
+        assert denied.returncode == 2
+        assert json.loads(allowed.stdout)["hookSpecificOutput"]["permissionDecision"] == "allow", args
+
+
+def test_guard_script_fails_closed_on_an_unusable_repo_root(tmp_path: Path):
+    """An empty --repo-root (for example an unset variable) must not guard the wrong folder."""
+    for value in ("", str(tmp_path / "missing")):
+        implementer = _run_script("implementation_guard.py", _claude_payload("service-implementer", "Write", file_path="x"), "--repo-root", value)
+        person = _run_script("implementation_guard.py", _claude_payload(None, "Write", file_path="x"), "--repo-root", value)
+        assert json.loads(implementer.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny", value
+        assert json.loads(person.stdout)["hookSpecificOutput"]["permissionDecision"] == "ask", value
+    dangling = _run_script("implementation_guard.py", _claude_payload("service-implementer", "Write", file_path="x"), "--repo-root")
+    assert json.loads(dangling.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
+
+
+def test_validate_hook_validates_the_repository_given_by_repo_root(tmp_path: Path):
+    empty = _run_script("validate_hook.py", {}, "--platform", "claude", "--repo-root", str(tmp_path))
+    assert empty.returncode == 0
+    assert empty.stdout == ""
+
+    app = tmp_path / "docs/artifacts/sample"
+    scaffold("functional-requirements", app, project="Sample", templates_dir=ARTIFACT_TEMPLATES)
+    broken = app / "functional-requirements.md"
+    broken.write_text(broken.read_text(encoding="utf-8").replace("| FR-001 | The system shall", "| FR-001 | Refers to FR-999; the system shall"), encoding="utf-8")
+    result = _run_script("validate_hook.py", {}, "--platform", "claude", "--repo-root", str(tmp_path))
+    assert result.returncode == 0
+    context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
+    assert "FR-999" in context
