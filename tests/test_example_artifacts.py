@@ -6,7 +6,7 @@ from pathlib import Path
 
 from artifact_tools.constants import ARTIFACT_TYPES
 from artifact_tools.frontmatter import split_document
-from artifact_tools.implementation import check_readiness
+from artifact_tools.readiness import check_readiness
 from artifact_tools.validate import validate_dir
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

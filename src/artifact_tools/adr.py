@@ -26,6 +26,7 @@ from artifact_tools.frontmatter import (
     render_document,
     split_document,
 )
+from artifact_tools.issues import Issue
 
 # Matches an ADR file such as "0002-event-driven-topology.md".
 ADR_FILE_RE = re.compile(r"^(\d{4})-.+\.md$")
@@ -94,12 +95,6 @@ def _safe_split(path: Path):
 # Index table maintenance
 # --------------------------------------------------------------------------- #
 
-_INDEX_HEADER = (
-    "| ID | Title | Date | Status | Component | Consequences | File |"
-)
-_INDEX_SEPARATOR = (
-    "|------|-------|------|--------|-----------|--------------|------|"
-)
 
 
 def _index_row(
@@ -297,8 +292,6 @@ def _supersede(
 
 def validate_adrs(adr_dir: str | Path) -> list:
     """Validate ADR records and their index. Returns a list of ``Issue`` objects."""
-    from artifact_tools.validate import Issue  # lazy to avoid a circular import
-
     adr_dir = Path(adr_dir)
     issues: list = []
     if not adr_dir.is_dir():
