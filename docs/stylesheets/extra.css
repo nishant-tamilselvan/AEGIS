@@ -1,0 +1,6 @@
+/* Docs site tweaks (mkdocs.yml extra_css). */
+
+/* Setup cards on the home page: 2 x 2 on wide screens, one column on phones. */
+.md-typeset .grid.cards.setups {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+}
