@@ -1,0 +1,21 @@
+{
+  // Markdown rules for AEGIS docs, agents, prompts, skills and templates.
+  "config": {
+    "default": true,
+    "MD013": false,  // line length: prose and tables wrap freely
+    "MD033": false,  // inline HTML: README header uses <p align="center">
+    "MD041": false,  // first line heading: agent/skill files start with frontmatter
+    "MD024": { "siblings_only": true },
+    "MD025": { "front_matter_title": "" },  // frontmatter `title:` is metadata, not a heading
+    "MD036": false,  // emphasis as heading: used for short callouts
+    "MD060": false   // table column style: tables are hand-aligned or compact
+  },
+  "ignores": [
+    "docs/artifacts/*/**",
+    // Scaffolding inputs: their exact layout is what AEGIS generates.
+    "**/assets/templates/**",
+    "**/node_modules/**",
+    ".venv/**",
+    "CHANGELOG.md"
+  ]
+}
