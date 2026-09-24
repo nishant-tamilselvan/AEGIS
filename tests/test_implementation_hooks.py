@@ -376,3 +376,44 @@ def test_wrapper_reports_deny_reason_on_stderr(tmp_path: Path, monkeypatch, caps
     assert wrapper.main() == 2
     captured = capsys.readouterr()
     assert "docs/artifacts" in captured.err
+
+
+# --------------------------------------------------------------------------- same-repository target
+
+
+def _same_repo_fixture(root: Path) -> Path:
+    """The repository that holds docs/artifacts is also the implementation target."""
+    (root / "README.md").write_text("# Repo\n", encoding="utf-8")
+    app = root / "docs/artifacts/sample"
+    for type_key in ARTIFACT_TYPES:
+        scaffold(type_key, app, project="Sample", templates_dir=ARTIFACT_TEMPLATES)
+    init_implementation(app, target_workspace=root, standards_review="verified", templates_dir=IMPLEMENTATION_TEMPLATES)
+    _, work_package_id = create_work_package(
+        app, "Slice", scope="Same-repo slice.", source_ids=["FR-001"],
+        target_paths=["apps/sample/src"], templates_dir=IMPLEMENTATION_TEMPLATES,
+    )
+    transition_work_package(app, work_package_id, "approved", actor="orchestrator", approved_by="lead")
+    transition_work_package(app, work_package_id, "in-progress", actor="service-implementer")
+    return app
+
+
+def test_same_repo_target_keeps_artifacts_writable_for_other_agents(tmp_path: Path):
+    root = tmp_path.resolve()
+    app = _same_repo_fixture(root)
+    manager = evaluate_guard(_claude_payload("artifact-manager", "Write", file_path=str(app / "product-requirements.md")), repo_root=root)
+    main_session = evaluate_guard(_claude_payload(None, "Edit", file_path=str(app / "implementation/decision.md")), repo_root=root)
+    assert manager.permission == "allow"
+    assert main_session.permission == "allow"
+
+
+def test_same_repo_target_still_bounds_code_and_implementers(tmp_path: Path):
+    root = tmp_path.resolve()
+    app = _same_repo_fixture(root)
+    main_code = evaluate_guard(_claude_payload(None, "Write", file_path=str(root / "apps/sample/src/app.py")), repo_root=root)
+    implementer_code = evaluate_guard(_claude_payload("service-implementer", "Write", file_path=str(root / "apps/sample/src/app.py")), repo_root=root)
+    implementer_outside = evaluate_guard(_claude_payload("service-implementer", "Write", file_path=str(root / "README.md")), repo_root=root)
+    implementer_artifact = evaluate_guard(_claude_payload("service-implementer", "Write", file_path=str(app / "product-requirements.md")), repo_root=root)
+    assert main_code.permission == "deny"
+    assert implementer_code.permission == "allow"
+    assert implementer_outside.permission == "deny"
+    assert implementer_artifact.permission == "deny"

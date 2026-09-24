@@ -16,6 +16,10 @@ may include breaking changes; they are listed under **Changed**.
 
 ### Fixed
 
+- When the implementation target is the same repository that holds `docs/artifacts/`,
+  the guard no longer blocks `artifact-manager` and other non-implementation agents from
+  writing artifacts. Implementers are still denied there, and code writes still require
+  the active package's implementer.
 - An installed CLI used outside an AEGIS clone could not find its templates. The wheel
   now bundles them; a repository's own templates still take precedence.
 
