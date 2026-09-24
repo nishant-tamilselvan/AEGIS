@@ -59,7 +59,7 @@ def scaffold(
     )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(content, encoding="utf-8")
+    out_path.write_text(content, encoding="utf-8", newline="\n")
 
     # The interface index is a router; create the native-format contract store beside it.
     if type_key == "interface-specifications":

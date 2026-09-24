@@ -77,5 +77,5 @@ def add_changelog(
     entry = f"- {today} — v{new_version} — {summary}"
     body = _insert_changelog_line(body, entry)
 
-    path.write_text(render_document(frontmatter, body), encoding="utf-8")
+    path.write_text(render_document(frontmatter, body), encoding="utf-8", newline="\n")
     return new_version
