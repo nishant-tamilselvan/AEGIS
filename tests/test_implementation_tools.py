@@ -14,7 +14,6 @@ from artifact_tools.implementation import (
     _collect_required_coverage_ids,
     add_decision,
     approve_release,
-    check_readiness,
     create_work_package,
     implementation_status,
     init_implementation,
@@ -22,6 +21,7 @@ from artifact_tools.implementation import (
     transition_work_package,
     validate_implementation,
 )
+from artifact_tools.readiness import check_readiness
 from artifact_tools.scaffold import scaffold
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

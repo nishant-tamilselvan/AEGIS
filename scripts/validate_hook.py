@@ -45,7 +45,8 @@ def main(argv: list[str] | None = None) -> int:
     # Drain stdin so the caller does not block on an unread pipe.
     try:
         sys.stdin.read()
-    except Exception:
+    except Exception:  # noqa: BLE001
+        # An unreadable or closed stdin is harmless here: the payload is not used.
         pass
 
     if not artifact_dir.is_dir():

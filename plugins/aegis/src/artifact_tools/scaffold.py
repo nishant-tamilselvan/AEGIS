@@ -7,6 +7,7 @@ from pathlib import Path
 
 from artifact_tools.constants import ARTIFACT_TYPES, resolve_type
 from artifact_tools.frontmatter import find_templates_dir
+from artifact_tools.interfaces import init_interfaces_dir
 
 
 def _fill_placeholders(text: str, project: str, title: str, today: str) -> str:
@@ -63,8 +64,6 @@ def scaffold(
 
     # The interface index is a router; create the native-format contract store beside it.
     if type_key == "interface-specifications":
-        from artifact_tools.interfaces import init_interfaces_dir
-
         init_interfaces_dir(out_path.parent)
 
     return out_path

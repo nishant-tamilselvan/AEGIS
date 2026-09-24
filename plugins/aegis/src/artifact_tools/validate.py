@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from artifact_tools.adr import collect_adr_ids, validate_adrs
 from artifact_tools.constants import (
     ADR_DIR,
     ARTIFACT_TYPES,
@@ -18,21 +19,13 @@ from artifact_tools.frontmatter import (
     FrontmatterError,
     split_document,
 )
+from artifact_tools.implementation import validate_implementation
+from artifact_tools.issues import Issue, has_errors
+
+__all__ = ["Issue", "has_errors", "validate_dir", "discover_app_dirs"]
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _VERSION_RE = re.compile(r"^\d+\.\d+$")
-
-
-@dataclass
-class Issue:
-    """A single validation finding."""
-
-    severity: str  # "error" | "warning"
-    file: str
-    message: str
-
-    def format(self) -> str:
-        return f"[{self.severity.upper()}] {self.file}: {self.message}"
 
 
 @dataclass
@@ -264,8 +257,6 @@ def _validate_app_dir(directory: Path, *, strict: bool, prefix: str = "") -> lis
     adr_ids: set[str] = set()
     adr_path = directory / ADR_DIR
     if adr_path.is_dir():
-        from artifact_tools.adr import collect_adr_ids, validate_adrs
-
         adr_ids = collect_adr_ids(adr_path)
         issues.extend(validate_adrs(adr_path))
 
@@ -278,8 +269,6 @@ def _validate_app_dir(directory: Path, *, strict: bool, prefix: str = "") -> lis
     # Phase-3 implementation state is nested under implementation/ and deliberately
     # has its own schema and identifiers. Validate it without treating those files as
     # one of the eleven top-level business/architecture artifacts.
-    from artifact_tools.implementation import validate_implementation
-
     issues.extend(
         Issue(item.severity, item.file, item.message)
         for item in validate_implementation(directory, strict=strict)
@@ -323,13 +312,3 @@ def validate_dir(directory: str | Path, *, strict: bool = False) -> list[Issue]:
 
     # Nothing recognised at all — keep the single-app warning contract.
     return _validate_app_dir(directory, strict=strict)
-
-
-def has_errors(issues: list[Issue], *, strict: bool = False) -> bool:
-    """Return True when validation should be considered failed."""
-    for issue in issues:
-        if issue.severity == "error":
-            return True
-        if strict and issue.severity == "warning":
-            return True
-    return False

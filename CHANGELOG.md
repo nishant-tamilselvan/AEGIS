@@ -26,6 +26,13 @@ may include breaking changes; they are listed under **Changed**.
   the user's repository. An empty or missing `--repo-root` value is treated as a guard
   failure: implementers are denied and other calls need approval.
 
+### Changed
+
+- `check_readiness` moved from `artifact_tools.implementation` to
+  `artifact_tools.readiness`, and `Issue` and `has_errors` moved to
+  `artifact_tools.issues` (`artifact_tools.validate` still re-exports them). This removes
+  the import cycles between the validators. The CLI is unchanged.
+
 ### Fixed
 
 - When the implementation target is the same repository that holds `docs/artifacts/`,

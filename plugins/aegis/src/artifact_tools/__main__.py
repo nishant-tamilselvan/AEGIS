@@ -13,7 +13,6 @@ from artifact_tools.diagrams import render_dir
 from artifact_tools.implementation import (
     add_decision,
     approve_release,
-    check_readiness,
     create_work_package,
     implementation_status,
     init_implementation,
@@ -22,6 +21,7 @@ from artifact_tools.implementation import (
     validate_implementation,
 )
 from artifact_tools.interfaces import init_interfaces_dir
+from artifact_tools.readiness import check_readiness
 from artifact_tools.scaffold import scaffold
 from artifact_tools.validate import has_errors, validate_dir
 
