@@ -479,3 +479,22 @@ def test_namespaced_plugin_agents_are_guarded_like_clone_agents(tmp_path: Path):
     wrapper = _load_guard_wrapper()
     assert wrapper.is_code_agent({"agent_type": "aegis:ui-implementer"})
     assert not wrapper.is_code_agent({"agent_type": "aegis:artifact-manager"})
+
+
+def test_implementer_cannot_write_outside_the_target_repository(tmp_path: Path):
+    """Regression: paths outside the target workspace were not bounded at all."""
+    _, target, root = _guard_fixture(tmp_path)
+    elsewhere = tmp_path / "somewhere-else" / "notes.md"
+    home_file = Path.home() / "aegis-guard-test.txt"
+    for tool, key in (("Write", "file_path"), ("Edit", "file_path"), ("NotebookEdit", "notebook_path")):
+        for path in (elsewhere, home_file):
+            decision = evaluate_guard(_claude_payload("service-implementer", tool, **{key: str(path)}), repo_root=root)
+            assert decision.permission == "deny", (tool, path)
+            assert "outside the active work package" in decision.reason
+    copilot = evaluate_guard(_payload("Service Implementer", "create_file", filePath=str(elsewhere)), repo_root=root)
+    assert copilot.permission == "deny"
+    # Reads and commands are not file writes, and stay allowed outside the target.
+    read = evaluate_guard(_claude_payload("service-implementer", "Read", file_path=str(elsewhere)), repo_root=root)
+    assert read.permission == "allow"
+    inside = evaluate_guard(_claude_payload("service-implementer", "Write", file_path=str(target / "apps/sample/src/ok.py")), repo_root=root)
+    assert inside.permission == "allow"
