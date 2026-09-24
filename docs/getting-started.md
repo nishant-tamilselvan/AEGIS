@@ -127,6 +127,8 @@ an independent review and recorded evidence before it can complete.
 
 ## Next steps
 
+- [The to-do list example](../examples/artifacts/): what a finished set of artifacts
+  looks like, before you run your own session.
 - [How it works](how-it-works.md): the phases, artifacts and guarantees.
 - [Agents, prompts and skills](agents.md): the full catalog.
 - [Troubleshooting](troubleshooting.md): when validation or readiness blocks you.
