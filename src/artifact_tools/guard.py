@@ -148,6 +148,25 @@ def _target_app_for_path(path: Path, apps: Iterable[Path]) -> Path | None:
     return None
 
 
+def _evaluate_other_agent(tool: str, args: dict[str, Any], root: Path) -> GuardDecision:
+    """Orchestrators, reviewers and the Claude Code main session.
+
+    They may read and run commands anywhere, and write anywhere except an initialized
+    implementation's target repository: code there is written only by the active work
+    package's implementation agent.
+    """
+    if tool in _WRITE_TOOLS:
+        apps = _implementation_apps(root)
+        for path in _extract_paths(args):
+            if _target_app_for_path(path, apps) is not None:
+                return GuardDecision(
+                    "deny",
+                    f"Only the active work package's implementation agent may write to the target repository ({path}); "
+                    "delegate the change to it.",
+                )
+    return GuardDecision("allow", "No implementation code-agent policy applies.")
+
+
 def evaluate_guard(payload: dict[str, Any], *, repo_root: str | Path) -> GuardDecision:
     """Evaluate one tool request without executing it or modifying state."""
 
@@ -157,7 +176,7 @@ def evaluate_guard(payload: dict[str, Any], *, repo_root: str | Path) -> GuardDe
     args = _payload_args(payload)
     is_code_agent = agent in IMPLEMENTATION_CODE_AGENTS
     if not is_code_agent:
-        return GuardDecision("allow", "No implementation code-agent policy applies.")
+        return _evaluate_other_agent(tool, args, root)
 
     paths = _extract_paths(args)
     artifact_root = root / "docs" / "artifacts"

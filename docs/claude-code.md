@@ -80,13 +80,17 @@ guard applies its rules when that subagent is one of the implementation agents:
 - file writes through the shell (`>`, `Set-Content` and similar) are denied;
 - destructive and deployment commands need your approval.
 
-If the guard cannot run, it does not silently allow the call. It asks you when it cannot
-load or read the call, and it denies when it hits an error. An unexpected approval prompt
-that mentions "AEGIS implementation guard" means the hook needs attention: check that
-`python` on your PATH can import PyYAML.
+Everyone else, including your main conversation (which carries no `agent_type`), the
+orchestrators and the reviewers, may read and run commands anywhere, and write anywhere
+except the target repository of an initialized implementation. Code there is written only
+by the active work package's implementer. A write there from anyone else is denied with a
+reminder to delegate.
 
-Tool calls made in your main conversation carry no `agent_type`. The guard does not
-restrict them, which matches how Copilot treats orchestrators.
+If the guard itself fails, it never silently allows the call. An implementation agent's
+call is denied. Any other call, including yours, is turned into an approval prompt that
+mentions "AEGIS implementation guard", so a broken guard cannot lock you out of your
+session. Such a prompt means the hook needs attention: check that `python` on your PATH
+can import PyYAML.
 
 ### Verify the guard once
 
