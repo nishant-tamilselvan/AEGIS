@@ -1,6 +1,6 @@
 <!-- Generated from scripts/sync_platforms.py by scripts/sync_platforms.py. Edit the source, not this file. -->
 
-# AEGIS plugin for Claude Code (v0.1.1)
+# AEGIS plugin for Claude Code (v0.1.2)
 
 Agents that turn an idea into approved requirements, an implementable architecture and reviewed code, grounded in your enterprise standards.
 

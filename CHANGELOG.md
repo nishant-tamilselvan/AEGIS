@@ -7,11 +7,16 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-24
+
+A security fix for the implementation guard, and a documentation site.
+
 ### Added
 
 - A documentation site at <https://nishant-tamilselvan.github.io/AEGIS/>, built from
-  `docs/` with MkDocs (pinned to 1.x) and published by GitHub Pages. CI builds it in
-  strict mode, so broken links fail the pull request.
+  `docs/` with MkDocs (pinned to 1.x) and published by GitHub Pages. Its home page
+  offers the four ways to set up AEGIS. CI builds it in strict mode, so broken links fail
+  the pull request.
 
 ### Security
 
@@ -131,6 +136,7 @@ First public, organization-neutral release, for GitHub Copilot and Claude Code.
 - The CLI writes LF line endings on every platform. On Windows, scaffolded artifacts,
   ADRs, changelog entries and contract stubs were written with CRLF.
 
-[Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/nishant-tamilselvan/AEGIS/releases/tag/v0.1.0
