@@ -7,7 +7,7 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-09-24
 
 First public, organization-neutral release, for GitHub Copilot and Claude Code.
 
