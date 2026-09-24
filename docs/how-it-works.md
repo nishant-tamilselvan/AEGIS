@@ -96,7 +96,9 @@ Every artifact is Markdown with YAML frontmatter (`version`, `status`, `last_upd
 - Implementation agents write only the declared target paths of the one active work
   package, and only in the target repository.
 - No one else writes to the target repository. Orchestrators, reviewers and the Claude
-  Code main conversation delegate code changes to the package's implementer.
+  Code main conversation delegate code changes to the package's implementer. If the
+  target is the same repository that holds `docs/artifacts/`, that folder stays writable
+  for artifact work, and implementers still cannot write there.
 
 ## Consistency guarantees
 

@@ -153,11 +153,15 @@ def _evaluate_other_agent(tool: str, args: dict[str, Any], root: Path) -> GuardD
 
     They may read and run commands anywhere, and write anywhere except an initialized
     implementation's target repository: code there is written only by the active work
-    package's implementation agent.
+    package's implementation agent. When the target is the repository that also holds
+    the artifacts, its ``docs/artifacts/`` stays writable so artifact work continues.
     """
     if tool in _WRITE_TOOLS:
         apps = _implementation_apps(root)
+        artifact_root = root / "docs" / "artifacts"
         for path in _extract_paths(args):
+            if _is_within(path, artifact_root):
+                continue
             if _target_app_for_path(path, apps) is not None:
                 return GuardDecision(
                     "deny",
