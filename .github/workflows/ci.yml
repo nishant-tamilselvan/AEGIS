@@ -110,6 +110,31 @@ jobs:
           "$tools" adr new "Pick a database" app/architecture-decisions --status accepted
           "$tools" validate app
 
+  plugin:
+    name: Validate Claude Code plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Pinned to the version the plugin was validated with; its postinstall fetches the CLI.
+      CLAUDE_CODE_VERSION: "2.1.263"
+      DISABLE_AUTOUPDATER: "1"
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install Claude Code
+        run: npm install --global "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+
+      - name: Validate marketplace, plugin, skills and agents
+        run: |
+          claude plugin validate --strict .
+          claude plugin validate --strict plugins/aegis
+          claude plugin validate --strict plugins/aegis/skills
+          claude plugin validate --strict plugins/aegis/agents
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest

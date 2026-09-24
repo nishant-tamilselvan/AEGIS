@@ -13,6 +13,15 @@ may include breaking changes; they are listed under **Changed**.
   `artifact_tools` module keep their names). Publishing a GitHub release publishes the
   package through Trusted Publishing. CI builds the package and runs the installed CLI
   outside the repository.
+- **Claude Code plugin (preview).** Install AEGIS into your own repository with
+  `/plugin marketplace add nishant-tamilselvan/AEGIS` and `/plugin install aegis@aegis`.
+  Commands are namespaced (`/aegis:start-ideation`), a `SessionStart` hook loads the
+  golden rules and checks for the `aegis-sdlc` CLI, and the guard runs against your
+  repository. The plugin is generated from `aegis/` and validated in CI with
+  `claude plugin validate --strict`. See
+  [docs/claude-code-plugin.md](docs/claude-code-plugin.md).
+- The guard recognizes namespaced plugin agents (`aegis:service-implementer`) as
+  implementers.
 - Both hook scripts accept `--repo-root`, so they can run from a plugin folder against
   the user's repository. An empty or missing `--repo-root` value is treated as a guard
   failure: implementers are denied and other calls need approval.

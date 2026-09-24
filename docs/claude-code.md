@@ -2,7 +2,8 @@
 
 AEGIS runs in [Claude Code](https://code.claude.com/docs) as well as in GitHub Copilot.
 Both platforms use the same agents, prompts, skills, golden rules, hooks and CLI. This page
-covers what is specific to Claude Code.
+covers what is specific to Claude Code, working in a clone of AEGIS. To install AEGIS into
+your own repository instead, see [AEGIS as a Claude Code plugin](claude-code-plugin.md).
 
 ## Set up
 

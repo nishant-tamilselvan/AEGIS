@@ -38,9 +38,15 @@ def test_generated_files_are_up_to_date():
     assert sync.main(["--check"]) == 0, "run: python scripts/sync_platforms.py"
 
 
+def _copy_generator_inputs(tmp_path: Path) -> None:
+    """Everything sync_platforms.py reads or owns, so it can run against a copy."""
+    for name in ("aegis", ".github", ".claude", ".claude-plugin", "plugins", "scripts", "src"):
+        shutil.copytree(REPO_ROOT / name, tmp_path / name, ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copy2(REPO_ROOT / "pyproject.toml", tmp_path / "pyproject.toml")
+
+
 def test_check_detects_edits_to_generated_files(tmp_path: Path):
-    for name in ("aegis", ".github", ".claude"):
-        shutil.copytree(REPO_ROOT / name, tmp_path / name)
+    _copy_generator_inputs(tmp_path)
     assert sync.main(["--check", "--root", str(tmp_path)]) == 0
     generated = tmp_path / ".claude/agents/artifact-manager.md"
     generated.write_text(generated.read_text(encoding="utf-8") + "\nhand edit\n", encoding="utf-8")
@@ -50,8 +56,7 @@ def test_check_detects_edits_to_generated_files(tmp_path: Path):
 
 def test_check_ignores_crlf_checkouts(tmp_path: Path):
     """A Windows checkout with core.autocrlf holds CRLF copies of LF-generated files."""
-    for name in ("aegis", ".github", ".claude"):
-        shutil.copytree(REPO_ROOT / name, tmp_path / name)
+    _copy_generator_inputs(tmp_path)
     crlf = bytes([13, 10])
     lf = bytes([10])
     for path in [*(tmp_path / ".claude").rglob("*.md"), *(tmp_path / "aegis/skills").rglob("*.md")]:
@@ -130,3 +135,58 @@ def test_claude_md_imports_the_single_source_rules():
     text = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
     assert "@aegis/instructions.md" in text
     assert "@AGENTS.md" in text
+
+
+# --------------------------------------------------------------------------- Claude Code plugin
+
+PLUGIN = REPO_ROOT / "plugins/aegis"
+
+
+def test_plugin_manifests_match_the_package():
+    manifest = json.loads((PLUGIN / ".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+    marketplace = json.loads((REPO_ROOT / ".claude-plugin/marketplace.json").read_text(encoding="utf-8"))
+    assert manifest["name"] == "aegis"
+    assert manifest["version"] == sync.package_version(REPO_ROOT)
+    entry = marketplace["plugins"][0]
+    assert entry["name"] == manifest["name"]
+    assert (REPO_ROOT / entry["source"]).resolve() == PLUGIN.resolve()
+
+
+def test_plugin_carries_the_same_agents_and_skills_as_the_clone():
+    for kind in ("agents", "skills"):
+        clone = {p.relative_to(CLAUDE / kind) for p in (CLAUDE / kind).rglob("*") if p.is_file()}
+        plugin = {p.relative_to(PLUGIN / kind) for p in (PLUGIN / kind).rglob("*") if p.is_file()}
+        assert clone == plugin, kind
+    # Only the prompt skills differ: they point at the session-start rules, not CLAUDE.md.
+    for path in (PLUGIN / "skills").glob("*/SKILL.md"):
+        text = path.read_text(encoding="utf-8")
+        if "disable-model-invocation: true" in text:
+            assert "in `CLAUDE.md`" not in text, path
+            assert "aegis:" in text, path
+
+
+def test_plugin_hooks_run_vendored_scripts_against_the_users_repository():
+    hooks = json.loads((PLUGIN / "hooks/hooks.json").read_text(encoding="utf-8"))["hooks"]
+    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse"}
+    pre = hooks["PreToolUse"][0]["hooks"][0]["command"]
+    post = hooks["PostToolUse"][0]["hooks"][0]["command"]
+    assert "${CLAUDE_PLUGIN_ROOT}/scripts/implementation_guard.py" in pre
+    assert "--repo-root \"$CLAUDE_PROJECT_DIR\"" in pre and "--repo-root \"$CLAUDE_PROJECT_DIR\"" in post
+    assert "--platform claude" in post
+    for name in sync.PLUGIN_SCRIPTS:
+        assert (PLUGIN / "scripts" / name).read_bytes() == (REPO_ROOT / "scripts" / name).read_bytes().replace(bytes([13]), b"")
+    vendored = {p.name for p in (PLUGIN / "src/artifact_tools").glob("*.py")}
+    assert vendored == {p.name for p in (REPO_ROOT / "src/artifact_tools").glob("*.py")}
+
+
+def test_session_start_delivers_rules_and_flags_a_missing_cli():
+    spec = importlib.util.spec_from_file_location("session_start", REPO_ROOT / "scripts/session_start.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    ok = module.build_output("Rule one.", installed=True)
+    assert ok["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert "Rule one." in ok["hookSpecificOutput"]["additionalContext"]
+    assert "systemMessage" not in ok
+    missing = module.build_output("Rule one.", installed=False)
+    assert "pip install aegis-sdlc" in missing["systemMessage"]
+    assert "pip install aegis-sdlc" in missing["hookSpecificOutput"]["additionalContext"]

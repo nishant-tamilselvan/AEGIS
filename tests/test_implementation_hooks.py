@@ -467,3 +467,15 @@ def test_validate_hook_validates_the_repository_given_by_repo_root(tmp_path: Pat
     assert result.returncode == 0
     context = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
     assert "FR-999" in context
+
+
+def test_namespaced_plugin_agents_are_guarded_like_clone_agents(tmp_path: Path):
+    """Claude Code plugin agents report agent_type as "<plugin>:<agent>"."""
+    _, target, root = _guard_fixture(tmp_path)
+    outside = str(target / "apps/other/app.py")
+    for agent in ("aegis:service-implementer", "Aegis:Service_Implementer"):
+        decision = evaluate_guard(_claude_payload(agent, "Write", file_path=outside), repo_root=root)
+        assert decision.permission == "deny", agent
+    wrapper = _load_guard_wrapper()
+    assert wrapper.is_code_agent({"agent_type": "aegis:ui-implementer"})
+    assert not wrapper.is_code_agent({"agent_type": "aegis:artifact-manager"})

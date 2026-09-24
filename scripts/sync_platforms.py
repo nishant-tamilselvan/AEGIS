@@ -220,8 +220,25 @@ def _inline_links(body: str) -> str:
     return body.replace("](../skills/", "](../")
 
 
-def _orchestrator_preamble(agent: Agent, agents: dict[str, Agent]) -> str:
+PLUGIN_NAME = "aegis"
+PLUGIN_DIR = f"plugins/{PLUGIN_NAME}"
+PLUGIN_AGENT_NOTE = (
+    f"In a plugin install the subagents are listed with the `{PLUGIN_NAME}:` prefix, for "
+    f"example `{PLUGIN_NAME}:artifact-manager`."
+)
+
+
+def _rules_line(plugin: bool) -> str:
+    where = "that AEGIS loaded at the start of this session" if plugin else "in `CLAUDE.md`"
+    return (
+        f"- **Follow the golden rules** {where}, including that only `artifact-manager` writes\n"
+        "  under `docs/artifacts/`.\n"
+    )
+
+
+def _orchestrator_preamble(agent: Agent, agents: dict[str, Agent], plugin: bool = False) -> str:
     specialists = ", ".join(f"`{h['agent']}`" for h in agent.handoffs)
+    plugin_note = f"\n  {PLUGIN_AGENT_NOTE}" if plugin else ""
     return f"""\
 ## How to run this in Claude Code
 
@@ -230,18 +247,16 @@ to the user directly and delegate specialist work to subagents.
 
 - **Delegate** with the Agent tool. Specialists for this role: {specialists}. Subagents
   cannot see this conversation, so give each one the application's `docs/artifacts/<app>`
-  path, the relevant ids and every decision it needs.
+  path, the relevant ids and every decision it needs.{plugin_note}
 - **Relay hand-offs.** When a subagent's final message hands work to another agent (for
   example "for `artifact-manager`: ..."), delegate that work to the named subagent.
 - **Ask the user** with the AskUserQuestion tool, one to three focused questions at a time.
 - **Track progress** with the task list.
-- **Follow the golden rules** in `CLAUDE.md`, including that only `artifact-manager` writes
-  under `docs/artifacts/`.
-
+{_rules_line(plugin)}
 """
 
 
-def claude_prompt_skill(prompt: Prompt, agents: dict[str, Agent]) -> str:
+def claude_prompt_skill(prompt: Prompt, agents: dict[str, Agent], plugin: bool = False) -> str:
     target = agents[prompt.agent]
     lines = [
         "---",
@@ -256,7 +271,8 @@ def claude_prompt_skill(prompt: Prompt, agents: dict[str, Agent]) -> str:
     request = f"## This request\n\n{prompt.body.strip()}\n\nArguments from the user: $ARGUMENTS\n"
     if target.role == "orchestrator":
         role = f"## Your role: {target.title}\n\n{_inline_links(target.body).strip()}\n\n"
-        return header + _orchestrator_preamble(target, agents) + role + request
+        return header + _orchestrator_preamble(target, agents, plugin) + role + request
+    plugin_note = f"\n{PLUGIN_AGENT_NOTE}" if plugin else ""
     delegate = f"""\
 ## How to run this in Claude Code
 
@@ -264,7 +280,7 @@ Delegate this request to the `{target.name}` subagent with the Agent tool. Pass 
 request below, the user's arguments and the application's `docs/artifacts/<app>` path.
 If it needs a decision, ask the user with AskUserQuestion and send the answer back to it.
 If its final message hands work to another agent, delegate that work to the named
-subagent. Report the outcome to the user.
+subagent. Report the outcome to the user.{plugin_note}
 
 """
     return header + delegate + request
@@ -284,6 +300,101 @@ def copilot_instructions(text: str) -> str:
 # --------------------------------------------------------------------------- planning
 
 
+PLUGIN_SCRIPTS = ("implementation_guard.py", "validate_hook.py", "session_start.py")
+REPO_URL = "https://github.com/nishant-tamilselvan/AEGIS"
+PLUGIN_DESCRIPTION = (
+    "Agents that turn an idea into approved requirements, an implementable architecture and "
+    "reviewed code, grounded in your enterprise standards."
+)
+
+
+def package_version(root: Path) -> str:
+    match = re.search(r'(?m)^version\s*=\s*"([^"]+)"', (root / "pyproject.toml").read_text(encoding="utf-8"))
+    if not match:
+        raise ValueError("pyproject.toml has no version")
+    return match.group(1)
+
+
+def _json(data: dict) -> str:
+    return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+
+
+def plugin_manifest(version: str) -> str:
+    return _json({
+        "name": PLUGIN_NAME,
+        "version": version,
+        "description": PLUGIN_DESCRIPTION,
+        "author": {"name": "Nishant Tamilselvan"},
+        "homepage": REPO_URL,
+        "repository": REPO_URL,
+        "license": "MIT",
+        "keywords": ["sdlc", "requirements", "architecture", "adr", "agents"],
+    })
+
+
+def marketplace_manifest() -> str:
+    return _json({
+        "name": PLUGIN_NAME,
+        "description": f"AEGIS: {PLUGIN_DESCRIPTION[0].lower()}{PLUGIN_DESCRIPTION[1:]}",
+        "owner": {"name": "Nishant Tamilselvan"},
+        "plugins": [
+            {"name": PLUGIN_NAME, "source": f"./{PLUGIN_DIR}", "description": PLUGIN_DESCRIPTION},
+        ],
+    })
+
+
+def plugin_hooks() -> str:
+    script = 'python "${CLAUDE_PLUGIN_ROOT}/scripts/%s"'
+    repo = '--repo-root "$CLAUDE_PROJECT_DIR"'
+    return _json({
+        "hooks": {
+            "SessionStart": [
+                {"hooks": [{"type": "command", "command": script % "session_start.py", "timeout": 10}]},
+            ],
+            "PreToolUse": [{
+                "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash|PowerShell",
+                "hooks": [{"type": "command", "command": f"{script % 'implementation_guard.py'} {repo}", "timeout": 10}],
+            }],
+            "PostToolUse": [{
+                "matcher": "Edit|Write|MultiEdit",
+                "hooks": [{
+                    "type": "command",
+                    "command": f"{script % 'validate_hook.py'} --platform claude {repo}",
+                    "timeout": 30,
+                }],
+            }],
+        }
+    })
+
+
+def plugin_readme(version: str) -> str:
+    return f"""<!-- {GENERATED_NOTE.format(source="scripts/sync_platforms.py")} -->
+
+# AEGIS plugin for Claude Code (v{version})
+
+{PLUGIN_DESCRIPTION}
+
+## Install
+
+```text
+/plugin marketplace add nishant-tamilselvan/AEGIS
+/plugin install aegis@aegis
+```
+
+The agents call the AEGIS CLI, so install it for the Python on your PATH:
+
+```bash
+pip install aegis-sdlc
+```
+
+## Use
+
+Run `/aegis:start-ideation <app-name> <idea>` in your repository. Artifacts are written to
+`docs/artifacts/<app-name>/` in that repository. See the
+[Claude Code plugin guide]({REPO_URL}/blob/main/docs/claude-code-plugin.md).
+"""
+
+
 def planned_files(root: Path) -> dict[Path, bytes]:
     """Every generated path (relative to root) and its exact content."""
     agents = load_agents(root)
@@ -297,9 +408,11 @@ def planned_files(root: Path) -> dict[Path, bytes]:
         put(f".github/agents/{agent.name}.agent.md", copilot_agent(agent, agents))
         if agent.role == "specialist":
             put(f".claude/agents/{agent.name}.md", claude_agent(agent))
+            put(f"{PLUGIN_DIR}/agents/{agent.name}.md", claude_agent(agent))
     for prompt in prompts.values():
         put(f".github/prompts/{prompt.name}.prompt.md", copilot_prompt(prompt, agents))
         put(f".claude/skills/{prompt.name}/SKILL.md", claude_prompt_skill(prompt, agents))
+        put(f"{PLUGIN_DIR}/skills/{prompt.name}/SKILL.md", claude_prompt_skill(prompt, agents, plugin=True))
 
     skills_root = root / SOURCE / "skills"
     for path in sorted(p for p in skills_root.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
@@ -310,15 +423,39 @@ def planned_files(root: Path) -> dict[Path, bytes]:
             data = skill_file(data.decode("utf-8"), source).encode("utf-8")
         for target in (".github/skills", ".claude/skills"):
             files[Path(target) / rel] = data
+        # The plugin has no docs/ or repository config, so links that climb out of the
+        # skill folder point at the repository on GitHub instead.
+        files[Path(PLUGIN_DIR) / "skills" / rel] = (
+            data.replace(b"](../../../", f"]({REPO_URL}/blob/main/".encode()) if path.suffix == ".md" else data
+        )
         if rel.parts[0] in prompts:
             raise ValueError(f"skill {rel.parts[0]!r} collides with a prompt of the same name")
 
-    put(".github/copilot-instructions.md", copilot_instructions((root / SOURCE / "instructions.md").read_text(encoding="utf-8")))
+    instructions = (root / SOURCE / "instructions.md").read_text(encoding="utf-8")
+    put(".github/copilot-instructions.md", copilot_instructions(instructions))
+
+    # Claude Code plugin (see docs/claude-code-plugin.md).
+    version = package_version(root)
+    put(".claude-plugin/marketplace.json", marketplace_manifest())
+    put(f"{PLUGIN_DIR}/.claude-plugin/plugin.json", plugin_manifest(version))
+    put(f"{PLUGIN_DIR}/hooks/hooks.json", plugin_hooks())
+    put(f"{PLUGIN_DIR}/README.md", plugin_readme(version))
+    put(f"{PLUGIN_DIR}/instructions.md", instructions)
+    for name in PLUGIN_SCRIPTS:
+        files[Path(PLUGIN_DIR) / "scripts" / name] = _lf((root / "scripts" / name).read_bytes())
+    # The hooks run from the plugin folder, so they carry their own artifact_tools copy.
+    # The agents use the installed aegis-sdlc CLI instead.
+    for path in sorted((root / "src" / "artifact_tools").glob("*.py")):
+        files[Path(PLUGIN_DIR) / "src" / "artifact_tools" / path.name] = _lf(path.read_bytes())
     return files
 
 
 # Directories whose contents this script owns entirely.
-OWNED_DIRS = (".github/agents", ".github/prompts", ".github/skills", ".claude/agents", ".claude/skills")
+OWNED_DIRS = (
+    ".github/agents", ".github/prompts", ".github/skills",
+    ".claude/agents", ".claude/skills",
+    ".claude-plugin", PLUGIN_DIR,
+)
 
 
 _NUL = bytes([0])

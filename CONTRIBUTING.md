@@ -85,6 +85,7 @@ If you work on AEGIS for an organization, list that organization's private terms
 | `aegis/instructions.md` | **Source** golden rules for every agent. |
 | `.github/agents/`, `.github/prompts/`, `.github/skills/`, `.github/copilot-instructions.md` | Generated for GitHub Copilot. Do not edit. |
 | `.claude/agents/`, `.claude/skills/` | Generated for Claude Code. Do not edit. |
+| `plugins/aegis/`, `.claude-plugin/marketplace.json` | Generated Claude Code plugin and marketplace, including copies of the hook scripts and `artifact_tools`. Do not edit. |
 | `.github/hooks/`, `.claude/settings.json` | Hook configuration for each platform. Both call the same scripts. |
 | `CLAUDE.md` | Claude Code entry point. Imports the golden rules and `AGENTS.md`. |
 | `src/artifact_tools/` | The CLI: scaffold, validate, ADRs, implementation state and the guard. |

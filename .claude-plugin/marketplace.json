@@ -1,0 +1,14 @@
+{
+  "name": "aegis",
+  "description": "AEGIS: agents that turn an idea into approved requirements, an implementable architecture and reviewed code, grounded in your enterprise standards.",
+  "owner": {
+    "name": "Nishant Tamilselvan"
+  },
+  "plugins": [
+    {
+      "name": "aegis",
+      "source": "./plugins/aegis",
+      "description": "Agents that turn an idea into approved requirements, an implementable architecture and reviewed code, grounded in your enterprise standards."
+    }
+  ]
+}
