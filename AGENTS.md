@@ -9,7 +9,8 @@ Instructions for AI coding agents (Copilot, Claude Code, Codex, Cursor and other
 AEGIS is a set of agents, prompts and skills for GitHub Copilot and Claude Code, backed
 by a Python CLI (`src/artifact_tools/`). Their single source is `aegis/`;
 `scripts/sync_platforms.py` generates `.github/{agents,prompts,skills}`,
-`.github/copilot-instructions.md`, `.claude/agents/` and `.claude/skills/` from it. The CLI
+`.github/copilot-instructions.md`, `.claude/agents/`, `.claude/skills/` and the Claude
+Code plugin (`plugins/aegis/`, `.claude-plugin/marketplace.json`) from it. The CLI
 scaffolds and validates Markdown artifacts, ADRs and phase-3 implementation state. A reference MCP server lives in
 `examples/enterprise-standards-server/`.
 
@@ -21,7 +22,7 @@ python -m pytest                        # run the tests
 ruff check .                            # lint Python
 python scripts/sync_platforms.py        # regenerate Copilot and Claude Code files from aegis/
 python scripts/ci/repo_checks.py all    # repository hygiene checks
-pre-commit run --all-files              # everything CI runs, including Markdown lint and gitleaks
+pre-commit run --all-files              # the fast CI checks, plus Markdown lint and gitleaks (not pytest)
 claude plugin validate --strict plugins/aegis   # plugin check CI also runs (needs Claude Code)
 ```
 
@@ -65,7 +66,7 @@ Run `sync_platforms.py`, the tests and `repo_checks.py all` before you finish an
 | `.github/agents/`, `.github/prompts/`, `.github/skills/` | Generated GitHub Copilot files. |
 | `.claude/agents/`, `.claude/skills/` | Generated Claude Code files. |
 | `plugins/aegis/`, `.claude-plugin/` | Generated Claude Code plugin and marketplace. |
-| `.github/hooks/`, `.claude/settings.json`, `scripts/` | Hook configuration for both platforms, hook entry points and `scripts/ci/` checks. |
+| `.github/hooks/`, `.claude/settings.json`, `scripts/` | Hook configuration for Copilot and a Claude Code clone (the plugin's is generated), hook entry points and `scripts/ci/` checks. |
 | `src/artifact_tools/` | CLI source. |
 | `examples/enterprise-standards-server/` | Reference MCP server and sample knowledge base. |
 | `docs/` | User documentation. `docs/artifacts/<app>/` is generated and gitignored. |

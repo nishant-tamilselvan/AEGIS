@@ -7,7 +7,7 @@
 | **Copilot:** AEGIS agents or slash commands do not appear in Copilot Chat. | Open the repository root as the VS Code workspace, not a subfolder. Switch Copilot Chat to Agent mode. Update VS Code and Copilot Chat if the agent picker is missing. |
 | `No module named artifact_tools` | In a clone, run `pip install -e .` in the active environment, or set `PYTHONPATH=src`. Anywhere else, including with the plugin, run `pip install aegis-sdlc`. |
 | `python` is not found on Windows. | Use `py -3` or install Python from python.org with "Add to PATH" selected. |
-| Hooks do not run. | Hooks are configured in `.github/hooks/validate-artifacts.json` (Copilot) and `.claude/settings.json` (Claude Code), and call `python`. Make sure `python` on your PATH has PyYAML installed. |
+| Hooks do not run. | Hooks are configured in `.github/hooks/validate-artifacts.json` (Copilot), `.claude/settings.json` (Claude Code clone) and the plugin's `hooks/hooks.json`, and call `python`. Make sure `python` on your PATH has PyYAML installed. |
 | Agents say "Enterprise Standards MCP unavailable". | See [Enterprise Standards troubleshooting](enterprise-standards-setup.md#troubleshooting). |
 
 ## Validation errors
@@ -48,7 +48,8 @@ Run `python -m artifact_tools validate docs/artifacts/<app>` to see the full lis
 
 ## The implementation guard denied an action
 
-The guard runs before every tool call from an implementation agent.
+The guard runs before file edits and shell commands from every agent. Implementation
+agents get the strictest rules; everyone else is kept out of the target repository.
 
 | Reason | Fix |
 | --- | --- |

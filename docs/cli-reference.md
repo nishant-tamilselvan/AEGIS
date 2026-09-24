@@ -97,9 +97,12 @@ python -m artifact_tools implementation readiness docs/artifacts/<app> <target-w
 
 # Create the implementation pointer and ledgers.
 python -m artifact_tools implementation init docs/artifacts/<app> <target-workspace> \
-  --target-baseline <commit> [--target-branch <branch>] [--project "<Name>"] \
+  [--target-baseline <commit>] [--target-branch <branch>] [--project "<Name>"] \
   [--standards-review verified|manual-review-required]
 ```
+
+`--target-baseline` is optional for `init`, but `implementation validate --strict`
+requires it, so record the target commit you started from.
 
 Pass `--standards-review verified` only after the current Enterprise Standards were
 checked, by the agents through the MCP server or by a person.

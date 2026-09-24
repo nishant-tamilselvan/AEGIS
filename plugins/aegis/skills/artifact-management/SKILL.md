@@ -86,7 +86,7 @@ the index. Re-create the store at any time with
 ### 3. Record the change and bump the version
 
 ```bash
-python -m artifact_tools changelog docs/artifacts/<app>/functional-requirements.md "Added FR-014 for offline sync" --phase 3
+python -m artifact_tools changelog docs/artifacts/<app>/functional-requirements.md "Added FR-014 for offline sync" --phase 1
 ```
 
 This appends a changelog line and bumps `version` + `last_updated` in frontmatter.

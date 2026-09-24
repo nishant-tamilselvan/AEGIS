@@ -67,7 +67,7 @@ body:
     id: version
     attributes:
       label: AEGIS version or commit
-      placeholder: v0.1.0 or a commit SHA
+      placeholder: v0.1.1 or a commit SHA
   - type: dropdown
     id: os
     attributes:

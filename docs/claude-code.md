@@ -76,7 +76,8 @@ guard applies its rules when that subagent is one of the implementation agents:
 `platform-implementer` or `test-quality-engineer`. It checks `Edit`, `Write`, `MultiEdit`,
 `NotebookEdit`, `Bash` and `PowerShell` calls:
 
-- writes outside the active work package's declared paths are denied;
+- file writes anywhere outside the active work package's declared paths are denied,
+  including paths outside the target repository;
 - writes under `docs/artifacts/` are denied;
 - file writes through the shell (`>`, `Set-Content` and similar) are denied;
 - destructive and deployment commands need your approval.
@@ -88,7 +89,8 @@ by the active work package's implementer. A write there from anyone else is deni
 reminder to delegate.
 
 If the guard itself fails, it never silently allows the call. An implementation agent's
-call is denied. Any other call, including yours, is turned into an approval prompt that
+call is denied. Any other call, including yours, is turned into an approval prompt, as
+is every call when the guard cannot read the hook payload at all. The prompt
 mentions "AEGIS implementation guard", so a broken guard cannot lock you out of your
 session. Such a prompt means the hook needs attention: check that `python` on your PATH
 can import PyYAML.

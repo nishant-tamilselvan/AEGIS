@@ -98,7 +98,7 @@ Every artifact is Markdown with YAML frontmatter (`version`, `status`, `last_upd
 - Only `artifact-manager` writes artifacts. Other agents propose content to it.
 - `adr-author` writes ADRs through the ADR tooling.
 - Implementation agents write only the declared target paths of the one active work
-  package, and only in the target repository.
+  package. Writes anywhere else, inside or outside the target repository, are denied.
 - No one else writes to the target repository. Orchestrators, reviewers and the Claude
   Code main conversation delegate code changes to the package's implementer. If the
   target is the same repository that holds `docs/artifacts/`, that folder stays writable
