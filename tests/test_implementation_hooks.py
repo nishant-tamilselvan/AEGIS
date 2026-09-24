@@ -1,0 +1,337 @@
+"""Tests for deterministic implementation-agent PreToolUse guardrails."""
+
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from artifact_tools.constants import ARTIFACT_TYPES
+from artifact_tools.guard import evaluate_guard
+from artifact_tools.implementation import (
+    create_work_package,
+    init_implementation,
+    transition_work_package,
+)
+from artifact_tools.scaffold import scaffold
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ARTIFACT_TEMPLATES = REPO_ROOT / "aegis/skills/artifact-management/assets/templates"
+IMPLEMENTATION_TEMPLATES = REPO_ROOT / "aegis/skills/implementation-management/assets/templates"
+
+
+def _guard_fixture(root: Path) -> tuple[Path, Path, Path]:
+    app = root / "docs/artifacts/sample"
+    for type_key in ARTIFACT_TYPES:
+        scaffold(type_key, app, project="Sample", templates_dir=ARTIFACT_TEMPLATES)
+    target = root / "target"
+    target.mkdir()
+    (target / "README.md").write_text("# Target\n", encoding="utf-8")
+    init_implementation(
+        app,
+        target_workspace=target,
+        standards_review="verified",
+        templates_dir=IMPLEMENTATION_TEMPLATES,
+    )
+    _, work_package_id = create_work_package(
+        app,
+        "Service slice",
+        scope="Implement service files.",
+        source_ids=["FR-001"],
+        target_paths=["apps/sample/src"],
+        templates_dir=IMPLEMENTATION_TEMPLATES,
+    )
+    transition_work_package(
+        app,
+        work_package_id,
+        "approved",
+        actor="orchestrator",
+        approved_by="delivery-lead",
+    )
+    transition_work_package(app, work_package_id, "in-progress", actor="service-implementer")
+    return app, target, root
+
+
+def _payload(agent: str, tool: str, **tool_args: object) -> dict:
+    return {"agentName": agent, "toolName": tool, "toolArgs": tool_args}
+
+
+def test_non_implementation_agent_is_unaffected(tmp_path: Path):
+    decision = evaluate_guard(
+        _payload("GitHub Copilot", "apply_patch", filePath=str(tmp_path / "anything.py")),
+        repo_root=tmp_path,
+    )
+    assert decision.permission == "allow"
+
+
+def test_code_agent_may_write_only_declared_target_paths(tmp_path: Path):
+    _, target, root = _guard_fixture(tmp_path)
+
+    allowed = evaluate_guard(
+        _payload(
+            "Service Implementer",
+            "create_file",
+            filePath=str(target / "apps/sample/src/index.ts"),
+        ),
+        repo_root=root,
+    )
+    denied = evaluate_guard(
+        _payload(
+            "Service Implementer",
+            "create_file",
+            filePath=str(target / "apps/other/src/index.ts"),
+        ),
+        repo_root=root,
+    )
+
+    assert allowed.permission == "allow"
+    assert "WP-0001" in allowed.reason
+    assert denied.permission == "deny"
+    assert "outside" in denied.reason
+
+
+def test_code_agent_cannot_write_artifacts(tmp_path: Path):
+    app, _, root = _guard_fixture(tmp_path)
+    decision = evaluate_guard(
+        _payload(
+            "UI Implementer",
+            "apply_patch",
+            input=f"*** Update File: {app / 'implementation/implementation.md'}",
+        ),
+        repo_root=root,
+    )
+    assert decision.permission == "deny"
+    assert "Artifact Manager" in decision.reason
+
+
+def test_code_agent_without_active_package_is_denied(tmp_path: Path):
+    app = tmp_path / "docs/artifacts/sample"
+    for type_key in ARTIFACT_TYPES:
+        scaffold(type_key, app, templates_dir=ARTIFACT_TEMPLATES)
+    target = tmp_path / "target"
+    target.mkdir()
+    (target / "README.md").write_text("# Target\n", encoding="utf-8")
+    init_implementation(
+        app,
+        target_workspace=target,
+        templates_dir=IMPLEMENTATION_TEMPLATES,
+    )
+
+    decision = evaluate_guard(
+        _payload("Platform Implementer", "create_file", filePath=str(target / "deploy.yaml")),
+        repo_root=tmp_path,
+    )
+    assert decision.permission == "deny"
+    assert "active work package" in decision.reason
+
+
+def test_destructive_and_deployment_commands_require_human_gate(tmp_path: Path):
+    _, target, root = _guard_fixture(tmp_path)
+    destructive = evaluate_guard(
+        _payload(
+            "Service Implementer",
+            "run_in_terminal",
+            command=f"Set-Location '{target}'; git reset --hard HEAD~1",
+            path=str(target / "apps/sample/src"),
+        ),
+        repo_root=root,
+    )
+    deployment = evaluate_guard(
+        _payload(
+            "Platform Implementer",
+            "run_in_terminal",
+            command="oc apply -f deploy.yaml",
+            path=str(target / "apps/sample/src"),
+        ),
+        repo_root=root,
+    )
+    assert destructive.permission == "ask"
+    assert deployment.permission == "ask"
+
+
+def test_shell_file_edit_is_denied(tmp_path: Path):
+    _, target, root = _guard_fixture(tmp_path)
+    decision = evaluate_guard(
+        _payload(
+            "Service Implementer",
+            "run_in_terminal",
+            command="'generated' | Set-Content apps/sample/src/generated.ts",
+            path=str(target / "apps/sample/src"),
+        ),
+        repo_root=root,
+    )
+    assert decision.permission == "deny"
+    assert "file-edit tools" in decision.reason
+
+
+def test_hook_wrapper_emits_vscode_permission_contract():
+    payload = json.dumps({"agentName": "GitHub Copilot", "toolName": "read_file", "toolArgs": {}})
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts/implementation_guard.py")],
+        input=payload,
+        text=True,
+        capture_output=True,
+        check=False,
+        cwd=REPO_ROOT,
+    )
+    output = json.loads(result.stdout)
+    assert result.returncode == 0
+    assert output["hookSpecificOutput"]["hookEventName"] == "PreToolUse"
+    assert output["hookSpecificOutput"]["permissionDecision"] == "allow"
+
+
+# --------------------------------------------------------------------------- Claude Code
+
+
+def _claude_payload(agent: str | None, tool: str, **tool_input: object) -> dict:
+    payload = {
+        "session_id": "test-session",
+        "hook_event_name": "PreToolUse",
+        "cwd": str(REPO_ROOT),
+        "tool_name": tool,
+        "tool_input": tool_input,
+    }
+    if agent is not None:
+        payload["agent_type"] = agent  # present only when a subagent makes the call
+    return payload
+
+
+def test_claude_subagent_write_is_bounded_by_work_package(tmp_path: Path):
+    _, target, root = _guard_fixture(tmp_path)
+    allowed = evaluate_guard(
+        _claude_payload("service-implementer", "Write", file_path=str(target / "apps/sample/src/app.py"), content="x"),
+        repo_root=root,
+    )
+    denied = evaluate_guard(
+        _claude_payload("service-implementer", "Edit", file_path=str(target / "apps/other/app.py"), old_string="a", new_string="b"),
+        repo_root=root,
+    )
+    notebook = evaluate_guard(
+        _claude_payload("test-quality-engineer", "NotebookEdit", notebook_path=str(target / "notebooks/x.ipynb"), new_source=""),
+        repo_root=root,
+    )
+    assert allowed.permission == "allow"
+    assert denied.permission == "deny"
+    assert notebook.permission == "deny"
+
+
+def test_claude_subagent_cannot_write_artifacts(tmp_path: Path):
+    app, _, root = _guard_fixture(tmp_path)
+    decision = evaluate_guard(
+        _claude_payload("ui-implementer", "MultiEdit", file_path=str(app / "product-requirements.md"), edits=[]),
+        repo_root=root,
+    )
+    assert decision.permission == "deny"
+
+
+def test_claude_bash_gates(tmp_path: Path):
+    _, _, root = _guard_fixture(tmp_path)
+    destructive = evaluate_guard(_claude_payload("platform-implementer", "Bash", command="rm -rf build"), repo_root=root)
+    deploy = evaluate_guard(_claude_payload("platform-implementer", "Bash", command="helm upgrade app ./chart"), repo_root=root)
+    redirect = evaluate_guard(_claude_payload("service-implementer", "Bash", command="echo hi > apps/sample/src/x.txt"), repo_root=root)
+    assert destructive.permission == "ask"
+    assert deploy.permission == "ask"
+    assert redirect.permission == "deny"
+
+
+def test_claude_main_session_and_other_subagents_are_unaffected(tmp_path: Path):
+    _, target, root = _guard_fixture(tmp_path)
+    main_session = evaluate_guard(_claude_payload(None, "Write", file_path=str(target / "anything.py")), repo_root=root)
+    reviewer = evaluate_guard(_claude_payload("critic-reviewer", "Bash", command="python -m pytest"), repo_root=root)
+    assert main_session.permission == "allow"
+    assert reviewer.permission == "allow"
+
+
+def test_hook_wrapper_accepts_claude_payload():
+    payload = json.dumps(_claude_payload("critic-reviewer", "Read", file_path=str(REPO_ROOT / "README.md")))
+    result = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "scripts/implementation_guard.py")],
+        input=payload,
+        text=True,
+        capture_output=True,
+        check=False,
+        cwd=REPO_ROOT,
+    )
+    output = json.loads(result.stdout)
+    assert output["hookSpecificOutput"]["permissionDecision"] == "allow"
+
+
+def _load_validate_hook():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("validate_hook", REPO_ROOT / "scripts/validate_hook.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_validate_hook_output_per_platform():
+    hook = _load_validate_hook()
+    assert hook.hook_output("fix FR-001", "copilot") == {"systemMessage": "fix FR-001"}
+    claude = hook.hook_output("fix FR-001", "claude")
+    assert claude["hookSpecificOutput"] == {"hookEventName": "PostToolUse", "additionalContext": "fix FR-001"}
+    assert "fix FR-001" not in claude["systemMessage"]
+
+
+# --------------------------------------------------------------------------- fail closed
+
+
+def _load_guard_wrapper():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("implementation_guard_wrapper", REPO_ROOT / "scripts/implementation_guard.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _run_wrapper(monkeypatch, capsys, stdin_text: str) -> tuple[int, dict, str]:
+    import io
+
+    wrapper = _load_guard_wrapper()
+    monkeypatch.setattr(sys, "stdin", io.StringIO(stdin_text))
+    code = wrapper.main()
+    captured = capsys.readouterr()
+    return code, json.loads(captured.out)["hookSpecificOutput"], captured.err
+
+
+def test_wrapper_asks_when_payload_is_unreadable(monkeypatch, capsys):
+    for text in ("not json", "[1, 2]", ""):
+        code, output, _ = _run_wrapper(monkeypatch, capsys, text)
+        assert output["permissionDecision"] == "ask", text
+        assert code == 0
+
+
+def test_wrapper_denies_when_the_guard_raises(monkeypatch, capsys):
+    import artifact_tools.guard as guard
+
+    def broken(payload, *, repo_root):
+        raise RuntimeError("corrupt implementation state")
+
+    monkeypatch.setattr(guard, "evaluate_guard", broken)
+    code, output, err = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload("service-implementer", "Write", file_path="x")))
+    assert output["permissionDecision"] == "deny"
+    assert "corrupt implementation state" in output["permissionDecisionReason"]
+    assert code == 2
+    assert "denying to stay safe" in err
+
+
+def test_wrapper_asks_when_the_guard_cannot_be_imported(monkeypatch, capsys):
+    monkeypatch.setitem(sys.modules, "artifact_tools.guard", None)
+    code, output, _ = _run_wrapper(monkeypatch, capsys, json.dumps(_claude_payload("service-implementer", "Write", file_path="x")))
+    assert output["permissionDecision"] == "ask"
+    assert "unavailable" in output["permissionDecisionReason"]
+    assert code == 0
+
+
+def test_wrapper_reports_deny_reason_on_stderr(tmp_path: Path, monkeypatch, capsys):
+    app, _, root = _guard_fixture(tmp_path)
+    wrapper = _load_guard_wrapper()
+    monkeypatch.setattr(wrapper, "REPO_ROOT", root)
+    import io
+
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(_claude_payload("ui-implementer", "Write", file_path=str(app / "x.md")))))
+    assert wrapper.main() == 2
+    captured = capsys.readouterr()
+    assert "docs/artifacts" in captured.err
