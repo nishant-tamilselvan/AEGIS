@@ -56,7 +56,7 @@ CI runs everything below on every pull request. Run it locally first:
 
 ```bash
 python scripts/sync_platforms.py        # regenerate Copilot and Claude Code files from aegis/
-python -m pytest                        # tests (Windows, macOS and Linux in CI)
+python -m pytest                        # tests (CI: Linux, Windows and macOS; full matrix weekly)
 ruff check .                            # Python lint
 python scripts/ci/repo_checks.py all    # personal paths, denylist, unicode, workflows, links
 pre-commit run --all-files              # all of the above plus Markdown lint and gitleaks

@@ -1,0 +1,43 @@
+name: Full test matrix
+
+# CI tests a reduced matrix on every pull request. This runs every OS and Python
+# combination once a week, and on demand, to catch platform-specific regressions.
+on:
+  schedule:
+    - cron: "17 6 * * 3"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Full matrix (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run tests
+        run: python -m pytest -q
