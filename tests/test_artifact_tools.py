@@ -353,3 +353,29 @@ def test_cli_writes_lf_line_endings_on_every_platform(tmp_path: Path):
     assert len(written) > 15
     carriage_return = bytes([13])
     assert [p.name for p in written if carriage_return in p.read_bytes()] == []
+
+
+def test_templates_come_from_the_repo_first_then_the_installed_package(tmp_path: Path, monkeypatch):
+    """An installed CLI works outside a repository; a repository's templates still win."""
+    from artifact_tools import frontmatter, implementation
+
+    impl_templates = REPO_ROOT / "aegis/skills/implementation-management/assets/templates"
+    bundled = {"artifact": TEMPLATES, "implementation": impl_templates}
+    monkeypatch.chdir(tmp_path)
+
+    # Outside any repository and without bundled templates: a clear error.
+    monkeypatch.setattr(frontmatter, "packaged_templates_dir", lambda kind: None)
+    monkeypatch.setattr(implementation, "packaged_templates_dir", lambda kind: None)
+    with pytest.raises(FileNotFoundError):
+        frontmatter.find_templates_dir(tmp_path)
+
+    # Outside any repository with bundled templates: the bundled copies.
+    monkeypatch.setattr(frontmatter, "packaged_templates_dir", bundled.get)
+    monkeypatch.setattr(implementation, "packaged_templates_dir", bundled.get)
+    assert frontmatter.find_templates_dir(tmp_path) == TEMPLATES
+    assert implementation._find_templates_dir(tmp_path) == impl_templates
+
+    # Inside a repository with its own templates: the repository's copy wins.
+    own = tmp_path / "repo/aegis/skills/artifact-management/assets/templates"
+    own.mkdir(parents=True)
+    assert frontmatter.find_templates_dir(tmp_path / "repo") == own

@@ -9,6 +9,19 @@ python -m artifact_tools <command> --help
 
 After `pip install -e .`, the same commands are also available as `artifact-tools`.
 
+## Install on its own
+
+The CLI is also published on PyPI as **`aegis-sdlc`**, for use outside an AEGIS clone,
+for example in CI:
+
+```bash
+pip install aegis-sdlc
+artifact-tools validate docs/artifacts/my-app --strict
+```
+
+The package bundles the artifact and implementation templates. When a repository has its
+own `aegis/skills/.../templates` folders, those are used instead.
+
 In the examples, `<app>` is an application folder such as `docs/artifacts/customer-portal`.
 
 ## Artifacts

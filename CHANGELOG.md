@@ -7,6 +7,18 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+### Added
+
+- The CLI is packaged for PyPI as `aegis-sdlc` (the `artifact-tools` command and the
+  `artifact_tools` module keep their names). Publishing a GitHub release publishes the
+  package through Trusted Publishing. CI builds the package and runs the installed CLI
+  outside the repository.
+
+### Fixed
+
+- An installed CLI used outside an AEGIS clone could not find its templates. The wheel
+  now bundles them; a repository's own templates still take precedence.
+
 ## [0.1.0] - 2026-09-24
 
 First public, organization-neutral release, for GitHub Copilot and Claude Code.
