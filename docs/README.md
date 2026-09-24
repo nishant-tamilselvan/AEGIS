@@ -1,5 +1,8 @@
 # AEGIS documentation
 
+These guides are also published, with search, as the
+[documentation site](https://nishant-tamilselvan.github.io/AEGIS/).
+
 | Guide | Read it when you want to |
 | --- | --- |
 | [Getting started](getting-started.md) | Install AEGIS and run your first ideation session. |

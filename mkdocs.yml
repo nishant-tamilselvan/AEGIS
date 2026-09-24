@@ -12,12 +12,18 @@ edit_uri: edit/main/docs/
 copyright: MIT licensed · If AEGIS is useful to you, please star it on GitHub.
 
 docs_dir: docs
+# docs/README.md is the index shown when browsing the folder on GitHub; the site's home
+# page is docs/index.md. The leading "/" keeps docs/artifacts/README.md on the site.
 exclude_docs: |
+  /README.md
   package-readme.md
   requirements.txt
 
 hooks:
   - scripts/docs_hooks.py
+
+extra_css:
+  - stylesheets/extra.css
 
 theme:
   name: material
@@ -50,7 +56,7 @@ theme:
     - toc.follow
 
 nav:
-  - Home: README.md
+  - Home: index.md
   - Get started:
       - Getting started: getting-started.md
       - How it works: how-it-works.md
@@ -74,6 +80,9 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
