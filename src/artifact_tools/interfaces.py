@@ -142,12 +142,12 @@ def init_interfaces_dir(base_dir: str | Path, *, with_stubs: bool = True) -> Pat
 
     readme = interfaces / "README.md"
     if not readme.exists():
-        readme.write_text(_README, encoding="utf-8")
+        readme.write_text(_README, encoding="utf-8", newline="\n")
 
     if with_stubs:
         for rel, content in _STUBS.items():
             target = interfaces / rel
             if not target.exists():
-                target.write_text(content, encoding="utf-8")
+                target.write_text(content, encoding="utf-8", newline="\n")
 
     return interfaces

@@ -332,3 +332,24 @@ def test_single_app_layout_still_supported(tmp_path: Path):
     assert not has_errors(issues)
     # File paths are not prefixed in the single-app case.
     assert not any("/" in i.file for i in issues if i.file.endswith(".md"))
+
+
+def test_cli_writes_lf_line_endings_on_every_platform(tmp_path: Path):
+    """Path.write_text translates newlines to CRLF on Windows unless told not to."""
+    from artifact_tools.adr import create_adr, init_adr_dir
+    from artifact_tools.interfaces import init_interfaces_dir
+
+    app = tmp_path / "app"
+    for type_key in ARTIFACT_TYPES:
+        scaffold(type_key, app, project="LF", templates_dir=TEMPLATES)
+    adr_dir = app / "architecture-decisions"
+    init_adr_dir(adr_dir, templates_dir=TEMPLATES)
+    create_adr("Pick a database", adr_dir, status="accepted", templates_dir=TEMPLATES)
+    create_adr("Pick a better database", adr_dir, supersedes="ADR-0002", templates_dir=TEMPLATES)
+    init_interfaces_dir(app)
+    add_changelog(app / "product-requirements.md", "Tightened scope")
+
+    written = [path for path in app.rglob("*") if path.is_file()]
+    assert len(written) > 15
+    carriage_return = bytes([13])
+    assert [p.name for p in written if carriage_return in p.read_bytes()] == []

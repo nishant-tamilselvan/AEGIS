@@ -78,7 +78,7 @@ def render_file(
         try:
             diagram = mermaidx.render(source, theme=theme)
             if fmt == "svg":
-                (out_dir / name).write_text(diagram.svg(), encoding="utf-8")
+                (out_dir / name).write_text(diagram.svg(), encoding="utf-8", newline="\n")
             else:
                 (out_dir / name).write_bytes(
                     diagram.png(scale=scale, background=background)
@@ -211,6 +211,6 @@ def render_dir(
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "manifest.json").write_text(
             json.dumps([asdict(r) for r in results], indent=2) + "\n",
-            encoding="utf-8",
+            encoding="utf-8", newline="\n",
         )
     return results
