@@ -1,0 +1,54 @@
+name: Enterprise Standards setup problem
+description: Trouble connecting a standards library or running the reference MCP server.
+title: "[Standards] "
+labels: ["enterprise-standards", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the [setup guide](https://github.com/nishant-tamilselvan/AEGIS/blob/main/docs/enterprise-standards-setup.md#troubleshooting) first.
+
+        **This issue is public.** Do not paste your `.vscode/mcp.json` or `.mcp.json` with URLs or tokens, and
+        do not paste your organization's standards. Use the sample knowledge base, or a
+        redacted document, to show the problem.
+  - type: dropdown
+    id: host
+    attributes:
+      label: Agent host
+      options:
+        - GitHub Copilot (VS Code)
+        - Claude Code
+        - Both
+    validations:
+      required: true
+  - type: dropdown
+    id: setup
+    attributes:
+      label: Which setup are you using?
+      options:
+        - Reference server, local (stdio)
+        - Reference server, shared (HTTP)
+        - My own MCP server implementing the tool contract
+    validations:
+      required: true
+  - type: dropdown
+    id: symptom
+    attributes:
+      label: What goes wrong?
+      options:
+        - The server does not start
+        - The server starts, but agents say "Enterprise Standards MCP unavailable"
+        - Tools appear, but searches return nothing
+        - library.py --check reports problems I do not understand
+        - Validation rejects the standard ids I cite
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: The command you ran and the shortest error. Redact hostnames and tokens.
+      render: text
+    validations:
+      required: true

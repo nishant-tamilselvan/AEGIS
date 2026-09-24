@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="160" viewBox="0 0 440 160" role="img" aria-labelledby="title desc">
+  <title id="title">AEGIS</title>
+  <desc id="desc">A shield with three stacked layers, next to the word AEGIS.</desc>
+  <defs>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3B6FE0"/>
+      <stop offset="1" stop-color="#1E3F9A"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield -->
+  <path d="M80 14 L136 34 V78 C136 112 112 136 80 148 C48 136 24 112 24 78 V34 Z" fill="url(#shield)"/>
+  <!-- Three phases as stacked layers -->
+  <path d="M52 62 L80 50 L108 62 L80 74 Z" fill="#FFFFFF"/>
+  <path d="M52 80 L80 92 L108 80" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
+  <path d="M52 98 L80 110 L108 98" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" opacity="0.65"/>
+  <!-- Wordmark: a mid-tone that stays readable on light and dark backgrounds -->
+  <text x="164" y="104" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="76" font-weight="700" letter-spacing="6" fill="#3B6FE0">AEGIS</text>
+</svg>

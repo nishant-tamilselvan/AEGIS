@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/nishant-tamilselvan/AEGIS/security/advisories/new
+    about: Report vulnerabilities privately. Never put secrets or exploit details in a public issue.
+  - name: Enterprise Standards setup guide
+    url: https://github.com/nishant-tamilselvan/AEGIS/blob/main/docs/enterprise-standards-setup.md
+    about: Connecting your organization's standards library, the tool contract and troubleshooting.
+  - name: Troubleshooting
+    url: https://github.com/nishant-tamilselvan/AEGIS/blob/main/docs/troubleshooting.md
+    about: Fixes for common setup, validation and implementation-gate problems.

@@ -1,0 +1,60 @@
+name: Feature request
+description: Suggest a new agent, phase, artifact, check or improvement.
+title: "[Feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem first. We can work out the best solution together.
+
+        **This issue is public.** Keep organization names, private standards and internal
+        details out of it.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      placeholder: When I ..., I have to ..., because ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like AEGIS to do?
+    validations:
+      required: true
+  - type: dropdown
+    id: host
+    attributes:
+      label: Which agent host is this for?
+      options:
+        - Both GitHub Copilot and Claude Code
+        - GitHub Copilot (VS Code) only
+        - Claude Code only
+        - Not host-specific (CLI, templates, docs)
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Ideation phase
+        - Architecture phase
+        - Implementation phase
+        - artifact_tools CLI or validation
+        - Enterprise Standards integration
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I would like to open a pull request for this.
