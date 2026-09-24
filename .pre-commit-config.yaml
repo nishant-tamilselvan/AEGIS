@@ -1,0 +1,59 @@
+# Install once with:  pip install -e ".[dev]" && pre-commit install
+# Run on everything:  pre-commit run --all-files
+# Hook repos are pinned to commit SHAs; update them with `pre-commit autoupdate --freeze`.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+        exclude: '\.(ps1|bat|cmd)$'
+      - id: trailing-whitespace
+        exclude: '\.md$'
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 2eeb5678de71a00c0902cbda7105d328432f72cb  # frozen: v0.16.8
+    hooks:
+      - id: ruff-check
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: 916ad0aaa108c64d294101002066f530ea170b10  # frozen: v0.23.3
+    hooks:
+      - id: markdownlint-cli2
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e  # frozen: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: aegis-sync-platforms
+        name: Generated Copilot and Claude Code files are up to date (run scripts/sync_platforms.py)
+        entry: python scripts/sync_platforms.py --check
+        language: python
+        additional_dependencies: ["PyYAML>=6.0"]
+        pass_filenames: false
+        files: '^(aegis/|\.github/(agents|prompts|skills)/|\.github/copilot-instructions\.md|\.claude/|scripts/sync_platforms\.py)'
+      - id: aegis-repo-checks
+        name: AEGIS repository checks (paths, denylist, unicode, workflows, links)
+        entry: python scripts/ci/repo_checks.py all
+        language: python
+        pass_filenames: false
+        always_run: true
+      - id: aegis-knowledge-base
+        name: Validate sample Enterprise Standards knowledge base
+        entry: python examples/enterprise-standards-server/library.py --check examples/enterprise-standards-server/knowledge-base
+        language: python
+        additional_dependencies: ["PyYAML>=6.0"]
+        pass_filenames: false
+        files: '^examples/enterprise-standards-server/'

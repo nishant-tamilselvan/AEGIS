@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels: ["dependencies", "ci"]
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+      - "/examples/enterprise-standards-server"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    versioning-strategy: "increase-if-necessary"
+    labels: ["dependencies", "python"]
+    commit-message:
+      prefix: "build"
+    groups:
+      python-security:
+        applies-to: security-updates
+        patterns: ["*"]
+      python-minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
