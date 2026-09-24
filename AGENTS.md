@@ -24,6 +24,7 @@ python scripts/sync_platforms.py        # regenerate Copilot and Claude Code fil
 python scripts/ci/repo_checks.py all    # repository hygiene checks
 pre-commit run --all-files              # the fast CI checks, plus Markdown lint and gitleaks (not pytest)
 claude plugin validate --strict plugins/aegis   # plugin check CI also runs (needs Claude Code)
+mkdocs build --strict                   # docs site; needs: pip install -r docs/requirements.txt
 ```
 
 Run `sync_platforms.py`, the tests and `repo_checks.py all` before you finish any change.

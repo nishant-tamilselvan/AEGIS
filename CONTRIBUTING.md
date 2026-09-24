@@ -13,6 +13,7 @@ your change must pass, and a checklist for each kind of component.
 - [Commit messages](#commit-messages)
 - [Pull requests](#pull-requests)
 - [Releasing](#releasing)
+- [Documentation site](#documentation-site)
 
 ## Before you start
 
@@ -49,6 +50,22 @@ If you work on the reference Enterprise Standards server, also install its depen
 ```bash
 pip install -r examples/enterprise-standards-server/requirements.txt
 ```
+
+## Documentation site
+
+The pages in `docs/` are published as the
+[documentation site](https://nishant-tamilselvan.github.io/AEGIS/) by
+`.github/workflows/pages.yml` whenever they change on `main`. Preview it locally:
+
+```bash
+pip install -r docs/requirements.txt
+mkdocs serve                           # http://127.0.0.1:8000
+mkdocs build --strict                  # what CI runs; fails on broken links
+```
+
+Link to other `docs/` pages with relative paths, as usual. Links to files outside `docs/`,
+such as `../CONTRIBUTING.md`, work on GitHub and are rewritten to GitHub URLs on the site
+by `scripts/docs_hooks.py`. Add a new page to `nav` in `mkdocs.yml`.
 
 ## Checks
 

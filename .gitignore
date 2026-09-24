@@ -27,3 +27,7 @@ CLAUDE.local.md
 
 # Local-only denylist of private terms (see scripts/ci/denylist.txt)
 .denylist.local
+
+# MkDocs build output
+site/
+_site/

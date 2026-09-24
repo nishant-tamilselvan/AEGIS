@@ -16,10 +16,16 @@ updates:
     directories:
       - "/"
       - "/examples/enterprise-standards-server"
+      - "/docs"
     schedule:
       interval: "weekly"
       day: "monday"
     versioning-strategy: "increase-if-necessary"
+    ignore:
+      # MkDocs 2 removes the plugin and theme systems the docs site depends on, with no
+      # migration path. Stay on 1.x until the Material theme supports a successor.
+      - dependency-name: "mkdocs"
+        update-types: ["version-update:semver-major"]
     labels: ["dependencies", "python"]
     commit-message:
       prefix: "build"

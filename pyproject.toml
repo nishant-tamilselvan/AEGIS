@@ -41,7 +41,7 @@ diagrams = [
 
 [project.urls]
 Homepage = "https://github.com/nishant-tamilselvan/AEGIS"
-Documentation = "https://github.com/nishant-tamilselvan/AEGIS/tree/main/docs"
+Documentation = "https://nishant-tamilselvan.github.io/AEGIS/"
 Issues = "https://github.com/nishant-tamilselvan/AEGIS/issues"
 Changelog = "https://github.com/nishant-tamilselvan/AEGIS/blob/main/CHANGELOG.md"
 
