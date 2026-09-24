@@ -1,0 +1,11 @@
+# Default owner for everything in the repository.
+* @nishant-tamilselvan
+
+# Security-sensitive paths: agent behavior, hooks, the guard and CI.
+/aegis/ @nishant-tamilselvan
+/.github/ @nishant-tamilselvan
+/.claude/ @nishant-tamilselvan
+/CLAUDE.md @nishant-tamilselvan
+/scripts/ @nishant-tamilselvan
+/src/artifact_tools/guard.py @nishant-tamilselvan
+/SECURITY.md @nishant-tamilselvan

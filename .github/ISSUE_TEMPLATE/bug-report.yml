@@ -1,0 +1,80 @@
+name: Bug report
+description: Something in AEGIS does not work as documented.
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. A short, specific report is enough to start.
+
+        **This issue is public.** Do not paste secrets, tokens, internal hostnames, private
+        standards, customer data or unredacted paths such as `C:\Users\<your-name>`.
+        Report vulnerabilities through the [private advisory form](https://github.com/nishant-tamilselvan/AEGIS/security/advisories/new) instead.
+  - type: dropdown
+    id: host
+    attributes:
+      label: Agent host
+      options:
+        - GitHub Copilot (VS Code)
+        - Claude Code
+        - Both
+        - Neither (CLI or scripts only)
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Ideation phase (agents, prompts, business artifacts)
+        - Architecture phase (agents, ADRs, technical artifacts)
+        - Implementation phase (readiness, work packages, guard, release gate)
+        - artifact_tools CLI or validation
+        - Hooks (implementation guard or validation)
+        - Generated platform files (scripts/sync_platforms.py)
+        - Enterprise Standards (skill or reference MCP server)
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+      placeholder: I expected ..., but ...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The prompt or command you ran, and the smallest input that shows the problem.
+      placeholder: |
+        1. Run `/start-ideation example-app ...`
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Error or validator output
+      description: Paste the shortest relevant output. Redact anything private.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: AEGIS version or commit
+      placeholder: v0.1.0 or a commit SHA
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows, macOS, Linux]
+  - type: input
+    id: environment
+    attributes:
+      label: Agent host and Python versions
+      description: For Copilot, the VS Code and Copilot Chat versions. For Claude Code, the output of `claude --version`.
+      placeholder: Claude Code 2.x (or VS Code 1.x + Copilot Chat 0.x), Python 3.12
