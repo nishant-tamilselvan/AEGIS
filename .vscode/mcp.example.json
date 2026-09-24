@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "enterprise-standards-server": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/examples/enterprise-standards-server/server.py",
+        "--knowledge-base",
+        "${workspaceFolder}/examples/enterprise-standards-server/knowledge-base"
+      ]
+    }
+  }
+}
