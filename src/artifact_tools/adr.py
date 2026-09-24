@@ -138,7 +138,7 @@ def _append_index_row(index_path: Path, row: str) -> None:
         raise ValueError(f"No ADR index table found in {index_path}")
     _, last_data_idx = bounds
     lines.insert(last_data_idx + 1, row)
-    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def _update_index_status(index_path: Path, target_id: str, new_status: str) -> None:
@@ -152,7 +152,7 @@ def _update_index_status(index_path: Path, target_id: str, new_status: str) -> N
             cells[4] = f" {new_status} "
             lines[i] = "|".join(cells)
         break
-    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    index_path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def _set_frontmatter_fields(path: Path, updates: dict) -> None:
@@ -160,7 +160,7 @@ def _set_frontmatter_fields(path: Path, updates: dict) -> None:
     if fm is None:
         raise ValueError(f"{path} has no frontmatter to update")
     fm.update(updates)
-    path.write_text(render_document(fm, body), encoding="utf-8")
+    path.write_text(render_document(fm, body), encoding="utf-8", newline="\n")
 
 
 # --------------------------------------------------------------------------- #
@@ -188,7 +188,7 @@ def init_adr_dir(adr_dir: str | Path, *, templates_dir: Path | None = None) -> P
         src = templates / "architecture-decisions-index.template.md"
         index_path.write_text(
             _fill(src.read_text(encoding="utf-8"), {"{{DATE}}": today}),
-            encoding="utf-8",
+            encoding="utf-8", newline="\n",
         )
 
     seed_path = adr_dir / ADR_TEMPLATE_FILENAME
@@ -208,7 +208,7 @@ def init_adr_dir(adr_dir: str | Path, *, templates_dir: Path | None = None) -> P
                     "{{SUPERSEDED_BY}}": "—",
                 },
             ),
-            encoding="utf-8",
+            encoding="utf-8", newline="\n",
         )
     return index_path
 
@@ -259,7 +259,7 @@ def create_adr(
                 "{{SUPERSEDED_BY}}": "—",
             },
         ),
-        encoding="utf-8",
+        encoding="utf-8", newline="\n",
     )
     _set_frontmatter_fields(out_path, {"supersedes": supersedes_val})
 
