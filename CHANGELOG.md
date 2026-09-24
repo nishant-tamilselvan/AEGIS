@@ -30,6 +30,9 @@ First public, organization-neutral release, for GitHub Copilot and Claude Code.
   shared by both hosts. The guard recognizes Copilot agent names and Claude Code subagents
   (`agent_type`). The validation hook returns feedback as `systemMessage` for Copilot and
   `additionalContext` for Claude Code (`--platform claude`).
+- A worked example, [`examples/artifacts/todo-list/`](examples/artifacts/): a complete,
+  approved phase 1 and phase 2 artifact set for a simple to-do app, with an OpenAPI 3.1
+  contract and two ADRs. CI keeps it passing strict validation and the readiness gate.
 - Enterprise Standards integration: the `enterprise-standards` skill, a reference MCP
   server with a sample knowledge base, MCP templates for both hosts
   (`.vscode/mcp.example.json`, `.mcp.example.json`) and a setup guide.
@@ -66,6 +69,8 @@ First public, organization-neutral release, for GitHub Copilot and Claude Code.
 
 - Writing implementation state no longer fails intermittently on Windows when another
   process briefly holds the file open. The atomic rename now retries.
+- The CLI writes LF line endings on every platform. On Windows, scaffolded artifacts,
+  ADRs, changelog entries and contract stubs were written with CRLF.
 
 [Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/nishant-tamilselvan/AEGIS/releases/tag/v0.1.0

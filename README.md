@@ -90,7 +90,10 @@ flowchart LR
 | **Implementation** | Work packages traced to the artifacts, a decision ledger, and reviewed code in your target repository. |
 
 Artifacts live in `docs/artifacts/<app-name>/`, one folder per application. See
-[how it works](docs/how-it-works.md) for the artifacts, ids and guarantees.
+[how it works](docs/how-it-works.md) for the artifacts, ids and guarantees, or browse a
+**[complete example for a simple to-do app](examples/artifacts/)**: every phase 1 and
+phase 2 artifact, an OpenAPI contract and two ADRs, all approved and ready for
+implementation.
 
 ## What's inside
 
