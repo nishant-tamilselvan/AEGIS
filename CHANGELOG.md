@@ -13,6 +13,9 @@ may include breaking changes; they are listed under **Changed**.
   `artifact_tools` module keep their names). Publishing a GitHub release publishes the
   package through Trusted Publishing. CI builds the package and runs the installed CLI
   outside the repository.
+- Both hook scripts accept `--repo-root`, so they can run from a plugin folder against
+  the user's repository. An empty or missing `--repo-root` value is treated as a guard
+  failure: implementers are denied and other calls need approval.
 
 ### Fixed
 
