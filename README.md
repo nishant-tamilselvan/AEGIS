@@ -58,7 +58,7 @@ Then open it in your agent host:
 
 | GitHub Copilot | Claude Code |
 | --- | --- |
-| Open the folder in VS Code and switch Copilot Chat to Agent mode. | Run `claude` in the folder. See [Using AEGIS with Claude Code](docs/claude-code.md). |
+| Open the folder in VS Code and switch Copilot Chat to Agent mode. | Run `claude` in the folder. See [Using AEGIS with Claude Code](docs/claude-code.md). Or install AEGIS into your own repository [as a plugin](docs/claude-code-plugin.md) (preview). |
 
 Start with the same command on either platform:
 

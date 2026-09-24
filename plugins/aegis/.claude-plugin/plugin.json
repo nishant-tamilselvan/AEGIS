@@ -1,0 +1,18 @@
+{
+  "name": "aegis",
+  "version": "0.1.0",
+  "description": "Agents that turn an idea into approved requirements, an implementable architecture and reviewed code, grounded in your enterprise standards.",
+  "author": {
+    "name": "Nishant Tamilselvan"
+  },
+  "homepage": "https://github.com/nishant-tamilselvan/AEGIS",
+  "repository": "https://github.com/nishant-tamilselvan/AEGIS",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "requirements",
+    "architecture",
+    "adr",
+    "agents"
+  ]
+}

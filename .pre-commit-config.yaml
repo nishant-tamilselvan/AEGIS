@@ -43,7 +43,8 @@ repos:
         language: python
         additional_dependencies: ["PyYAML>=6.0"]
         pass_filenames: false
-        files: '^(aegis/|\.github/(agents|prompts|skills)/|\.github/copilot-instructions\.md|\.claude/|scripts/sync_platforms\.py)'
+        # The plugin copies scripts/ and src/, and takes its version from pyproject.toml.
+        files: '^(aegis/|\.github/(agents|prompts|skills)/|\.github/copilot-instructions\.md|\.claude/|\.claude-plugin/|plugins/|scripts/|src/|pyproject\.toml)'
       - id: aegis-repo-checks
         name: AEGIS repository checks (paths, denylist, unicode, workflows, links)
         entry: python scripts/ci/repo_checks.py all

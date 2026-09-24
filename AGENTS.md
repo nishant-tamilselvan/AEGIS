@@ -37,8 +37,9 @@ Run `sync_platforms.py`, the tests and `repo_checks.py all` before you finish an
    and PyYAML.
 4. **Edit `aegis/`, never the generated copies.** Files in `.github/agents/`,
    `.github/prompts/`, `.github/skills/`, `.github/copilot-instructions.md`,
-   `.claude/agents/` and `.claude/skills/` are generated. Change the source in `aegis/`,
-   then run `python scripts/sync_platforms.py`. CI fails if they drift.
+   `.claude/agents/`, `.claude/skills/`, `plugins/aegis/` and `.claude-plugin/` are
+   generated. Change the source in `aegis/` (or the scripts and `src/` that the plugin
+   copies), then run `python scripts/sync_platforms.py`. CI fails if they drift.
 5. **Do not edit artifact templates casually.** Files under
    `aegis/skills/*/assets/templates/` define what AEGIS generates. A template change is a
    product change: update the tests and the changelog with it.
@@ -62,6 +63,7 @@ Run `sync_platforms.py`, the tests and `repo_checks.py all` before you finish an
 | `aegis/` | Source of the product agents, prompts, skills and golden rules. |
 | `.github/agents/`, `.github/prompts/`, `.github/skills/` | Generated GitHub Copilot files. |
 | `.claude/agents/`, `.claude/skills/` | Generated Claude Code files. |
+| `plugins/aegis/`, `.claude-plugin/` | Generated Claude Code plugin and marketplace. |
 | `.github/hooks/`, `.claude/settings.json`, `scripts/` | Hook configuration for both platforms, hook entry points and `scripts/ci/` checks. |
 | `src/artifact_tools/` | CLI source. |
 | `examples/enterprise-standards-server/` | Reference MCP server and sample knowledge base. |
