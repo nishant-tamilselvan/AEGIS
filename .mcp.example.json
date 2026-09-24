@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "enterprise-standards-server": {
+      "command": "python",
+      "args": [
+        "examples/enterprise-standards-server/server.py",
+        "--knowledge-base",
+        "examples/enterprise-standards-server/knowledge-base"
+      ]
+    }
+  }
+}

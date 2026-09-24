@@ -1,0 +1,20 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "python scripts/implementation_guard.py",
+        "windows": "python scripts\\implementation_guard.py",
+        "timeout": 10
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "python scripts/validate_hook.py",
+        "windows": "python scripts\\validate_hook.py",
+        "timeout": 30
+      }
+    ]
+  }
+}
