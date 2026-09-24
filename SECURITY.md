@@ -65,8 +65,9 @@ Out of scope:
 Know these limits before you rely on AEGIS:
 
 - **The implementation guard is a safeguard, not a sandbox.** It checks the tool calls
-  the agent host reports to it, and it fails closed: if it cannot load or read a call it
-  asks you, and if it errors it denies. It cannot see tools the host does not route
+  the agent host reports to it, and it never fails open: if it breaks, implementation
+  agents are denied and every other call becomes an approval prompt. Only the active
+  package's implementer may write to the target repository. It cannot see tools the host does not route
   through the hook, or hooks you have disabled. Review every change an agent makes before
   you merge it.
 - **Standards content is untrusted input.** Agents treat documents returned by

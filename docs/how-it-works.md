@@ -94,6 +94,8 @@ Every artifact is Markdown with YAML frontmatter (`version`, `status`, `last_upd
 - `adr-author` writes ADRs through the ADR tooling.
 - Implementation agents write only the declared target paths of the one active work
   package, and only in the target repository.
+- No one else writes to the target repository. Orchestrators, reviewers and the Claude
+  Code main conversation delegate code changes to the package's implementer.
 
 ## Consistency guarantees
 
