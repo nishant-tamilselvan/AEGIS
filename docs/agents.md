@@ -6,7 +6,9 @@ Agents are written once in [`aegis/agents/`](../aegis/agents/) and generated for
 Copilot (`.github/agents/`) and Claude Code (`.claude/agents/`). Orchestrators talk to
 you. Specialists do focused work and report back to their orchestrator. In Claude Code,
 orchestrators run in the main conversation and specialists run as subagents; see
-[Using AEGIS with Claude Code](claude-code.md).
+[Using AEGIS with Claude Code](claude-code.md). In the
+[Claude Code plugin](claude-code-plugin.md), every name below carries an `aegis:` prefix:
+agents such as `aegis:artifact-manager`, and commands such as `/aegis:start-ideation`.
 
 ### Ideation (phase 1)
 

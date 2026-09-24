@@ -11,6 +11,9 @@
   <a href="https://github.com/nishant-tamilselvan/AEGIS/actions/workflows/ci.yml"><img src="https://github.com/nishant-tamilselvan/AEGIS/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI" /></a>
   <a href="https://github.com/nishant-tamilselvan/AEGIS/actions/workflows/codeql.yml"><img src="https://github.com/nishant-tamilselvan/AEGIS/actions/workflows/codeql.yml/badge.svg?branch=main" alt="CodeQL" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/nishant-tamilselvan/AEGIS"><img src="https://api.scorecard.dev/projects/github.com/nishant-tamilselvan/AEGIS/badge" alt="OpenSSF Scorecard" /></a>
+  <a href="https://pypi.org/project/aegis-sdlc/"><img src="https://img.shields.io/pypi/v/aegis-sdlc?label=PyPI&amp;logo=pypi&amp;logoColor=white" alt="PyPI version" /></a>
+  <a href="https://github.com/nishant-tamilselvan/AEGIS/releases/latest"><img src="https://img.shields.io/github/v/release/nishant-tamilselvan/AEGIS?label=release" alt="Latest release" /></a>
+  <a href="https://github.com/nishant-tamilselvan/AEGIS/stargazers"><img src="https://img.shields.io/github/stars/nishant-tamilselvan/AEGIS?style=flat&amp;logo=github" alt="GitHub stars" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license" /></a>
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10+" />
   <img src="https://img.shields.io/badge/VS%20Code-Copilot%20agents-007ACC?logo=visualstudiocode&amp;logoColor=white" alt="VS Code Copilot agents" />
@@ -58,7 +61,16 @@ Then open it in your agent host:
 
 | GitHub Copilot | Claude Code |
 | --- | --- |
-| Open the folder in VS Code and switch Copilot Chat to Agent mode. | Run `claude` in the folder. See [Using AEGIS with Claude Code](docs/claude-code.md). Or install AEGIS into your own repository [as a plugin](docs/claude-code-plugin.md) (preview). |
+| Open the folder in VS Code and switch Copilot Chat to Agent mode. | Run `claude` in the folder. See [Using AEGIS with Claude Code](docs/claude-code.md). |
+
+Other ways to get AEGIS:
+
+- **Claude Code plugin (preview):** install AEGIS into your own repository instead of
+  working in a clone. Run `/plugin marketplace add nishant-tamilselvan/AEGIS`, then
+  `/plugin install aegis@aegis`, then `pip install aegis-sdlc`. See
+  [AEGIS as a Claude Code plugin](docs/claude-code-plugin.md).
+- **CLI only:** `pip install aegis-sdlc` gives you the `artifact-tools` command, for
+  example to validate artifacts in CI. See the [CLI reference](docs/cli-reference.md).
 
 Start with the same command on either platform:
 
@@ -69,6 +81,9 @@ Start with the same command on either platform:
 When ideation is done, continue with `/start-architecture customer-portal`, then
 `/start-implementation customer-portal <absolute-path-to-target-repo>`.
 The [getting started guide](docs/getting-started.md) walks through each phase.
+
+> ⭐ **Finding AEGIS useful?** [Star the repository](https://github.com/nishant-tamilselvan/AEGIS)
+> so other teams can discover it too.
 
 ## How it works
 
@@ -101,10 +116,10 @@ implementation.
 | --- | --- |
 | **18 agents** | 3 orchestrators and 15 specialists across the three phases. [Catalog](docs/agents.md). |
 | **10 prompts** | Slash commands to start, resume, review and change each phase. [List](docs/agents.md#prompts). |
-| **2 platforms, 1 source** | Everything is written once in `aegis/` and generated for GitHub Copilot (`.github/`) and Claude Code (`.claude/`). |
+| **2 platforms, 1 source** | Everything is written once in `aegis/` and generated for GitHub Copilot (`.github/`), Claude Code (`.claude/`) and the Claude Code plugin (`plugins/aegis/`). |
 | **4 skills** | Artifact, ADR and implementation management, and Enterprise Standards grounding. |
-| **2 hooks** | A guard before implementation tool calls, and validation after every edit, on both platforms. |
-| **`artifact_tools` CLI** | Scaffold, validate, ADRs, contracts, diagrams and implementation state. [Reference](docs/cli-reference.md). |
+| **Hooks** | A guard before implementation tool calls, and validation after every edit, on both platforms. The plugin adds a session-start hook that loads the golden rules. |
+| **`artifact_tools` CLI** | Scaffold, validate, ADRs, contracts, diagrams and implementation state. On PyPI as [`aegis-sdlc`](https://pypi.org/project/aegis-sdlc/). [Reference](docs/cli-reference.md). |
 | **Reference MCP server** | Serves your standards from Markdown files. [Setup](docs/enterprise-standards-setup.md). |
 
 ## Enterprise Standards
@@ -126,6 +141,13 @@ privately. See [SECURITY.md](SECURITY.md).
 Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the setup, the
 checks CI runs and a checklist for each kind of component. This project follows the
 [Code of Conduct](CODE_OF_CONDUCT.md). Changes are recorded in the [changelog](CHANGELOG.md).
+
+## Support the project
+
+If AEGIS saves you time, please:
+
+- ⭐ **[Star the repository](https://github.com/nishant-tamilselvan/AEGIS)**, so more teams can find it.
+- **Share what you built with it**, or what got in your way, in a [feature request or bug report](https://github.com/nishant-tamilselvan/AEGIS/issues/new/choose).
 
 ## License
 

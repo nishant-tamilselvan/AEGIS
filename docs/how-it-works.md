@@ -25,18 +25,22 @@ flowchart LR
 
 ## Where it runs
 
-AEGIS runs in two agent hosts. Both use the same agents, rules, hooks and CLI, generated
-from `aegis/`:
+AEGIS runs in two agent hosts, and in Claude Code either from a clone or as a plugin. All
+three use the same agents, rules, hooks and CLI, generated from `aegis/`:
 
-| | GitHub Copilot (VS Code) | Claude Code |
-| --- | --- | --- |
-| Orchestrators | Custom agents | The main conversation, started by a slash command |
-| Specialists | Custom agents, reached by handoffs | Subagents, reached with the Agent tool |
-| Prompts | Prompt files (`/start-ideation` and others) | Slash-command skills with the same names |
-| Hooks | `.github/hooks/` | `.claude/settings.json` |
-| Standards MCP config | `.vscode/mcp.json` | `.mcp.json` |
+| | GitHub Copilot (VS Code) | Claude Code (clone) | Claude Code plugin |
+| --- | --- | --- | --- |
+| Where AEGIS lives | The AEGIS clone | The AEGIS clone | Your own repository |
+| Orchestrators | Custom agents | The main conversation, started by a slash command | The same, with `/aegis:` commands |
+| Specialists | Custom agents, reached by handoffs | Subagents, reached with the Agent tool | Subagents named `aegis:<name>` |
+| Prompts | Prompt files (`/start-ideation` and others) | Slash-command skills with the same names | `/aegis:start-ideation` and others |
+| Golden rules | `.github/copilot-instructions.md` | `CLAUDE.md` | Loaded by a session-start hook |
+| Hooks | `.github/hooks/` | `.claude/settings.json` | The plugin's `hooks/hooks.json` |
+| Standards MCP config | `.vscode/mcp.json` | `.mcp.json` | `.mcp.json` in your repository |
+| CLI | `pip install -e .` | `pip install -e .` | `pip install aegis-sdlc` |
 
-See [Using AEGIS with Claude Code](claude-code.md) for the Claude Code details.
+See [Using AEGIS with Claude Code](claude-code.md) and
+[AEGIS as a Claude Code plugin](claude-code-plugin.md) for the details.
 
 ## The three phases
 

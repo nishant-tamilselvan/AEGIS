@@ -284,6 +284,11 @@ they often hold URLs and credentials, and each has a committed template:
 | --- | --- | --- | --- |
 | GitHub Copilot in VS Code | `.vscode/mcp.json` | `.vscode/mcp.example.json` | VS Code `inputs` (prompted, stored securely) |
 | Claude Code | `.mcp.json` | `.mcp.example.json` | `${ENV_VAR}` expansion |
+| Claude Code plugin | `.mcp.json` in **your own** repository | Copy the Claude Code section below | `${ENV_VAR}` expansion |
+
+Plugin users have no AEGIS clone to run the reference server from. Use your organization's
+shared server over HTTP, or clone AEGIS once and point `command` and `args` at its
+`examples/enterprise-standards-server/server.py` with absolute paths.
 
 In both, keep the server name exactly `enterprise-standards-server`. The agents refer to
 it by that name: `enterprise-standards-server/*` in Copilot and

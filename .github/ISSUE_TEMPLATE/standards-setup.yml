@@ -17,8 +17,9 @@ body:
       label: Agent host
       options:
         - GitHub Copilot (VS Code)
-        - Claude Code
-        - Both
+        - Claude Code (in an AEGIS clone)
+        - Claude Code plugin
+        - More than one of these
     validations:
       required: true
   - type: dropdown
