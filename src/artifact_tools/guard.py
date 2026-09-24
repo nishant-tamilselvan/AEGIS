@@ -211,8 +211,12 @@ def evaluate_guard(payload: dict[str, Any], *, repo_root: str | Path) -> GuardDe
 
     target_root = Path(str(pointer["target_workspace"])).resolve()
     allowed_roots = [(target_root / str(value)).resolve() for value in work_package.get("target_paths") or ()]
+    # A file-write tool may only touch the package's declared paths, wherever the path
+    # points: outside the target repository is outside the package too. Other tools (for
+    # example a shell command's working directory) are bounded inside the target only.
     for path in paths:
-        if _is_within(path, target_root) and not any(_is_within(path, allowed) for allowed in allowed_roots):
+        bounded = tool in _WRITE_TOOLS or _is_within(path, target_root)
+        if bounded and not any(_is_within(path, allowed) for allowed in allowed_roots):
             return GuardDecision(
                 "deny",
                 f"Path {path} is outside the active work package's declared target paths.",

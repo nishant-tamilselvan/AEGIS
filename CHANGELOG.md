@@ -7,6 +7,13 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+### Security
+
+- An implementation agent could write files **outside the target repository**, for
+  example in the home folder, because the guard bounded only paths inside the target.
+  File writes by implementers are now limited to the active work package's declared
+  paths wherever they point. Found by a documentation audit; covered by a regression test.
+
 ### Changed
 
 - CI tests a reduced matrix on each run (all Pythons on Linux, 3.10 and 3.13 on Windows,
