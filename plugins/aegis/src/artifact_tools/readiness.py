@@ -6,12 +6,12 @@ itself validates implementation state. Keeping the two apart avoids an import cy
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from artifact_tools.constants import ARTIFACT_TYPES
 from artifact_tools.frontmatter import DEFINED_ID_RE
 from artifact_tools.implementation import (
-    _TBD_RE,
     IMPLEMENTATION_DIR,
     POINTER_FILE,
     ImplementationFinding,
@@ -22,6 +22,8 @@ from artifact_tools.implementation import (
 from artifact_tools.validate import has_errors, validate_dir
 
 __all__ = ["ReadinessReport", "check_readiness"]
+
+_TBD_RE = re.compile(r"\b(?:TBD|TO BE DECIDED)\b", re.IGNORECASE)
 
 
 def check_readiness(

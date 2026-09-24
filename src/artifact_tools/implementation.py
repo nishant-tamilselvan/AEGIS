@@ -51,7 +51,6 @@ _IDEC_ID_RE = re.compile(r"\bIDEC-(\d{4})\b")
 _INTERNAL_SOURCE_RE = re.compile(r"^(?:FR|NFR|BP|IF|DM|SEC|DEP|OBS|ADR)-\d{3,4}$")
 _OPEN_DECISIONS_HEADING_RE = re.compile(r"^#{2,3}\s+.*open decisions", re.IGNORECASE)
 _BLOCKING_DECISION_RE = re.compile(r"\byes\b", re.IGNORECASE)
-_TBD_RE = re.compile(r"\b(?:TBD|TO BE DECIDED)\b", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
