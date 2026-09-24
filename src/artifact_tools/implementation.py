@@ -17,6 +17,7 @@ from artifact_tools.constants import ARTIFACT_TYPES
 from artifact_tools.frontmatter import (
     DEFINED_ID_RE,
     FrontmatterError,
+    packaged_templates_dir,
     render_document,
     split_document,
 )
@@ -96,6 +97,9 @@ def _find_templates_dir(start: Path | None = None) -> Path:
             target = candidate / relative
             if target.is_dir():
                 return target
+    packaged = packaged_templates_dir("implementation")
+    if packaged is not None:
+        return packaged
     raise FileNotFoundError(f"Could not locate implementation templates ({relative}) from {current}.")
 
 

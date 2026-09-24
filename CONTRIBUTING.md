@@ -12,6 +12,7 @@ your change must pass, and a checklist for each kind of component.
 - [Component checklists](#component-checklists)
 - [Commit messages](#commit-messages)
 - [Pull requests](#pull-requests)
+- [Releasing](#releasing)
 
 ## Before you start
 
@@ -173,3 +174,18 @@ Example: `fix(guard): reject target paths that escape through symlinks`.
 3. Add an entry under **Unreleased** in [CHANGELOG.md](CHANGELOG.md) for any change users
    will notice.
 4. CI must pass. `CODEOWNERS` requests a maintainer review automatically.
+
+## Releasing
+
+Maintainers release from `main`:
+
+1. Open a pull request that sets `version` in `pyproject.toml` to the new version and
+   renames the changelog's **Unreleased** section to `[X.Y.Z] - YYYY-MM-DD`, with a
+   new empty **Unreleased** section above it and updated comparison links at the bottom.
+2. Merge it once CI passes.
+3. Publish a GitHub release with the tag `vX.Y.Z` on that commit, using the changelog
+   section as the notes.
+
+Publishing the release runs `.github/workflows/publish.yml`. It checks that the tag
+matches the package version, builds the sdist and wheel, and publishes `aegis-sdlc` to
+PyPI through Trusted Publishing, so no API token is stored.
