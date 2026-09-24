@@ -113,6 +113,27 @@ A read-only readiness gate runs first. It blocks until:
 The orchestrator then plans bounded work packages (`WP-*`). Each needs your approval,
 an independent review and recorded evidence before it can complete.
 
+### Check the implementation guard once
+
+The guard is what keeps implementation agents inside their work package. It runs as a
+hook, so confirm that your agent host actually runs it before you rely on it:
+
+1. Approve the first work package and let the orchestrator move it to `in-progress`.
+2. Ask the orchestrator: *"As a guard test, have the package's implementer create one
+   file outside the package's target paths. Do not retry."*
+3. The write must be **denied** with *"… is outside the active work package's declared
+   target paths."*
+
+If the write goes through, the hooks are not running:
+
+| Host | Where the hooks are configured | What to check |
+| --- | --- | --- |
+| GitHub Copilot | `.github/hooks/validate-artifacts.json` | Your VS Code and Copilot Chat versions support agent hooks, and hooks are enabled for this workspace. |
+| Claude Code | `.claude/settings.json` | `/hooks` lists the `PreToolUse` hook, and you trusted the folder interactively. See [Using AEGIS with Claude Code](claude-code.md#verify-the-guard-once). |
+
+On both hosts, `python` on your PATH must be able to import PyYAML, because the hooks run
+`python scripts/implementation_guard.py`.
+
 ## Other prompts
 
 | Prompt | Use it to |
