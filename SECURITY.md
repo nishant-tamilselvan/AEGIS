@@ -14,6 +14,10 @@ AEGIS is pre-1.0. Security fixes go into the latest release and `main` only.
 Report vulnerabilities privately through GitHub:
 **[Report a vulnerability](https://github.com/nishant-tamilselvan/AEGIS/security/advisories/new)**.
 
+You need to be signed in to GitHub. If the link does not open the form, go to the
+repository's **[Security](https://github.com/nishant-tamilselvan/AEGIS/security)** tab and
+select **Report a vulnerability**. Only the reporter and the maintainers can see the report.
+
 Do not open a public issue, pull request or discussion for a vulnerability.
 
 Include:
