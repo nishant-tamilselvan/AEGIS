@@ -78,7 +78,8 @@ hold several products. Requirement ids are unique within an application.
 
 Every artifact is Markdown with YAML frontmatter (`version`, `status`, `last_updated`,
 `phase`). Documents refer to each other by stable ids. The
-[applications index](artifacts/README.md) describes the layout in detail.
+[applications index](artifacts/README.md) describes the layout in detail, and the
+[to-do list example](../examples/artifacts/todo-list/) shows a complete, approved set.
 
 **Implementation state (phase 3)** lives in `docs/artifacts/<app>/implementation/`:
 
