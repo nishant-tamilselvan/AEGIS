@@ -124,6 +124,22 @@ implementation.
 | **`artifact_tools` CLI** | Scaffold, validate, ADRs, contracts, diagrams and implementation state. On PyPI as [`aegis-sdlc`](https://pypi.org/project/aegis-sdlc/). [Reference](docs/cli-reference.md). |
 | **Reference MCP server** | Serves your standards from Markdown files. [Setup](docs/enterprise-standards-setup.md). |
 
+## Where AEGIS fits
+
+AEGIS is a reference implementation of the
+[Enterprise AI Framework](https://nishant-tamilselvan.github.io/enterprise-ai-framework/)
+delivery model. The framework describes the process: a specification before code,
+[lifecycle gates](https://nishant-tamilselvan.github.io/enterprise-ai-framework/governance/operating-model/#lifecycle-gates)
+and a named human who approves the release. AEGIS runs that process in your editor.
+
+| Resource | What it gives you |
+| --- | --- |
+| [Delivery model](https://nishant-tamilselvan.github.io/enterprise-ai-framework/delivery/overview/) | The process AEGIS follows, independent of any tool |
+| [Reference implementation page](https://nishant-tamilselvan.github.io/enterprise-ai-framework/delivery/reference-implementation-aegis/) | How each part of the framework maps to AEGIS, and what AEGIS does not cover |
+| [Starter standards library](https://github.com/nishant-tamilselvan/enterprise-ai-framework/tree/master/standards) | Six framework rules in the format the reference server reads. They start as `Draft`, so your organization reviews and approves them first. |
+
+The same person maintains both projects.
+
 ## Enterprise Standards
 
 Connect your organization's standards, policies, patterns and enterprise decisions through
