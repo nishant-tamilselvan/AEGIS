@@ -14,6 +14,10 @@ may include breaking changes; they are listed under **Changed**.
   (`references/banned.json`) and a checker, `scripts/sloplint.py`. `artifact-manager` and
   `adr-author` run the checker on what they write, and `critic-reviewer` reports its
   errors as advisory findings.
+- A "Where AEGIS fits" section in the README and in [How it works](docs/how-it-works.md).
+  It links to the Enterprise AI Framework delivery model, which AEGIS implements, and
+  lists the gaps AEGIS leaves to you. The Enterprise Standards setup guide points to the
+  framework's starter standards library.
 
 ### Changed
 

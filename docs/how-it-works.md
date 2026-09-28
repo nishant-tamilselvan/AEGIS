@@ -130,3 +130,21 @@ Before each phase asks you anything, the agents query your organization's Enterp
 Standards library. They build on what the standards already mandate, cite the standard
 ids in the artifacts, and ask you only about what the standards leave open. See
 [Enterprise Standards setup](enterprise-standards-setup.md).
+
+## Where AEGIS fits
+
+AEGIS is a reference implementation of the
+[Enterprise AI Framework](https://nishant-tamilselvan.github.io/enterprise-ai-framework/)
+delivery model. The framework describes the process without naming a tool, and AEGIS
+runs it. The three phases produce the specification. The readiness gate and the release
+approval match the framework's
+[lifecycle gates](https://nishant-tamilselvan.github.io/enterprise-ai-framework/governance/operating-model/#lifecycle-gates).
+
+The framework's
+[reference implementation page](https://nishant-tamilselvan.github.io/enterprise-ai-framework/delivery/reference-implementation-aegis/)
+maps each part of the framework to AEGIS. It also lists what AEGIS leaves to you:
+
+| Gap | What to do |
+| --- | --- |
+| The reviewer of each work package is an agent | Have a second person review each pull request before you merge it |
+| AEGIS stops at release approval | Run and monitor the system, and change or retire it, with your own processes |

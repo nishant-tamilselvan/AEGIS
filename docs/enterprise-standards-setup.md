@@ -50,6 +50,12 @@ which becomes `enterprise-standards-server/*` for Copilot and
 Most teams start with option A. The reference server is small enough to read in one
 sitting, so it also serves as a working specification for option B.
 
+If you have no written standards yet, the Enterprise AI Framework publishes a
+[starter library](https://github.com/nishant-tamilselvan/enterprise-ai-framework/tree/master/standards)
+of six documents in this format. They cover lifecycle gates, specification completeness
+and agent tool scoping, among others. Every document starts as `Draft`, and agents use
+only `Approved` documents. Review each one, then set its status to `Approved`.
+
 ## Quick start with the reference server
 
 This runs the server with the sample standards, so you can see AEGIS use them before you
