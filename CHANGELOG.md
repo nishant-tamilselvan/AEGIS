@@ -7,6 +7,11 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-28
+
+A writing-style skill that keeps artifacts in plain prose, and a link to the Enterprise AI
+Framework that AEGIS implements.
+
 ### Added
 
 - A `writing-style` skill. It sets the rules for plain, readable prose in artifacts,
@@ -160,7 +165,8 @@ First public, organization-neutral release, for GitHub Copilot and Claude Code.
 - The CLI writes LF line endings on every platform. On Windows, scaffolded artifacts,
   ADRs, changelog entries and contract stubs were written with CRLF.
 
-[Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/nishant-tamilselvan/AEGIS/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/nishant-tamilselvan/AEGIS/releases/tag/v0.1.0
