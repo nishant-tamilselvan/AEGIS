@@ -8,7 +8,7 @@ phase: 1
 owner: artifact-manager
 ---
 
-# Executive Briefing — {{PROJECT_NAME}}
+# Executive Briefing: {{PROJECT_NAME}}
 
 > One page for stakeholders. Synthesized from the other five artifacts. Keep it tight.
 
@@ -16,14 +16,16 @@ owner: artifact-manager
 _One sentence: what decision or support is needed._
 
 ## Opportunity
-_The problem and the value of solving it — 2-3 sentences._
+_The problem and the value of solving it: 2-3 sentences._
 
 ## Proposed Solution
 _What we will build, at a glance._
 
 ## Scope Snapshot
-- **In:** _..._
-- **Out (now):** _..._
+| Item | Value |
+| --- | --- |
+| In | _..._ |
+| Out (now) | _..._ |
 
 ## Success Metrics
 | Metric | Target |
@@ -36,10 +38,12 @@ _What we will build, at a glance._
 | RISK-001 | _..._ | med | high | _..._ |
 
 ## Status
-- **Phase:** 1
-- **Overall readiness:** draft
+| Item | Value |
+| --- | --- |
+| Phase | 1 |
+| Overall readiness | draft |
 
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 1).
+- {{DATE}}, v0.1: Initial scaffold (phase 1).

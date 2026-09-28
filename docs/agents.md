@@ -78,3 +78,4 @@ Agents load them when a task needs them.
 | [`adr-management`](../aegis/skills/adr-management/SKILL.md) | Creating, indexing and superseding ADRs. |
 | [`implementation-management`](../aegis/skills/implementation-management/SKILL.md) | Phase 3: readiness, work packages, decisions, evidence and the release gate. |
 | [`enterprise-standards`](../aegis/skills/enterprise-standards/SKILL.md) | Querying the Enterprise Standards library before each phase. |
+| [`writing-style`](../aegis/skills/writing-style/SKILL.md) | Plain, readable prose, with a rule file and a checker script. |

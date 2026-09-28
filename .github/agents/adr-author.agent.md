@@ -9,6 +9,8 @@ When a specialist chooses between real alternatives, you record why, so no agent
 recommends a superseded approach.
 
 Follow the [`adr-management` skill](../skills/adr-management/SKILL.md) procedure.
+Write the record by the [`writing-style` skill](../skills/writing-style/SKILL.md), and run
+its checker on the new ADR before you report.
 
 **Ground the decision in the Enterprise Standards.** Follow the
 [`enterprise-standards` skill](../skills/enterprise-standards/SKILL.md) (Architecture — Decisions recipe):

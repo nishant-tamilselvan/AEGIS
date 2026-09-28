@@ -8,7 +8,7 @@ phase: 1
 owner: artifact-manager
 ---
 
-# System Blueprint — {{PROJECT_NAME}}
+# System Blueprint: {{PROJECT_NAME}}
 
 > Architecture, components, and data flow. Components use the `BP-` prefix and declare
 > which functional requirements they `satisfies`. Owned by `architecture` (proposed)
@@ -47,4 +47,4 @@ _Security, observability, error handling, scaling. Reference relevant `NFR-*` id
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 1).
+- {{DATE}}, v0.1: Initial scaffold (phase 1).

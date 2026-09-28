@@ -8,7 +8,7 @@ phase: 1
 owner: artifact-manager
 ---
 
-# Product Requirements — {{PROJECT_NAME}}
+# Product Requirements: {{PROJECT_NAME}}
 
 > Vision, scope, goals, and constraints. This is the "why" and the boundaries.
 > Maintained by `artifact-manager`. Requirement IDs use the `PR-` prefix and are
@@ -51,4 +51,4 @@ _What pain exists today, for whom, and why current solutions fall short._
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 1).
+- {{DATE}}, v0.1: Initial scaffold (phase 1).

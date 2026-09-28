@@ -8,7 +8,7 @@ phase: 2
 owner: artifact-manager
 ---
 
-# Interface & Integration Specifications Index — {{PROJECT_NAME}}
+# Interface & Integration Specifications Index: {{PROJECT_NAME}}
 
 > **This document is a routing index, not a contract dump.** It maps every interface to
 > its native contract file under [`interfaces/`](interfaces/) (OpenAPI/AsyncAPI `.yaml`
@@ -42,12 +42,12 @@ owner: artifact-manager
 
 - **One contract per file.** Name files `<service>-<version>` (sync) or
   `<domain>-<broker>` (async). Never inline a full spec into this index.
-- **Error & versioning**: the standard error envelope and versioning policy live in the
+- **Error & versioning.** the standard error envelope and versioning policy live in the
   contract files; note breaking-change rules here only if they are cross-cutting.
-- **Correlation**: every async payload carries a `correlation_id` (see the observability
+- **Correlation.** every async payload carries a `correlation_id` (see the observability
   strategy).
 
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 2).
+- {{DATE}}, v0.1: Initial scaffold (phase 2).

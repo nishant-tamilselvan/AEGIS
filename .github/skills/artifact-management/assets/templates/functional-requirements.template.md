@@ -8,16 +8,16 @@ phase: 1
 owner: artifact-manager
 ---
 
-# Functional Requirements — {{PROJECT_NAME}}
+# Functional Requirements: {{PROJECT_NAME}}
 
 > What the system must do. Each requirement is atomic, testable, and traces back to
 > a product goal (`PR-*`) or a user journey (`UJ-*`). IDs use the `FR-` prefix.
 
 ## Legend
 
-- **Priority**: `must` | `should` | `could` | `wont`
-- **Status**: `draft` | `in-review` | `approved` | `removed`
-- **traces_to**: comma-separated `PR-*` / `UJ-*` ids that justify this requirement.
+- **Priority.** `must` | `should` | `could` | `wont`
+- **Status.** `draft` | `in-review` | `approved` | `removed`
+- **traces_to.** comma-separated `PR-*` / `UJ-*` ids that justify this requirement.
 
 ## Requirements
 
@@ -33,4 +33,4 @@ owner: artifact-manager
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 1).
+- {{DATE}}, v0.1: Initial scaffold (phase 1).

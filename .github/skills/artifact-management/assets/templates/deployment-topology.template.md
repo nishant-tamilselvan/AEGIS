@@ -8,7 +8,7 @@ phase: 2
 owner: artifact-manager
 ---
 
-# Deployment Topology — {{PROJECT_NAME}}
+# Deployment Topology: {{PROJECT_NAME}}
 
 > How the software runs in the cloud: networks, environments, and recovery. Nodes use
 > the `DEP-` prefix and `mitigates` the operational non-functional requirements
@@ -17,8 +17,8 @@ owner: artifact-manager
 
 ## Legend
 
-- **Zone**: `public` | `private` | `data` | `management`
-- **Status**: `draft` | `in-review` | `approved` | `removed`
+- **Zone.** `public` | `private` | `data` | `management`
+- **Status.** `draft` | `in-review` | `approved` | `removed`
 
 ## 1. Network Topology
 
@@ -57,9 +57,9 @@ flowchart TB
 
 ## 4. CI/CD & Infrastructure as Code
 
-- **Pipeline**: _build → test → scan → deploy stages._
-- **IaC**: _Terraform / Ansible — module layout and state management._
-- **Promotion**: _how artifacts move Dev → QA → Staging → Prod._
+- **Pipeline.** _build → test → scan → deploy stages._
+- **IaC.** _Terraform / Ansible: module layout and state management._
+- **Promotion.** _how artifacts move Dev → QA → Staging → Prod._
 
 ## 5. Disaster Recovery
 
@@ -74,4 +74,4 @@ _Backups, replication, failover region, and restore drills. Targets derive from
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 2).
+- {{DATE}}, v0.1: Initial scaffold (phase 2).

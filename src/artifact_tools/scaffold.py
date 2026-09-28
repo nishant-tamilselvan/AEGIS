@@ -15,7 +15,7 @@ def _fill_placeholders(text: str, project: str, title: str, today: str) -> str:
         "{{PROJECT_NAME}}": project,
         "{{TITLE}}": title,
         "{{DATE}}": today,
-        "{{PRIMARY_JOURNEY}}": f"{project} — primary journey",
+        "{{PRIMARY_JOURNEY}}": f"{project}: primary journey",
     }
     for token, value in replacements.items():
         text = text.replace(token, value)
@@ -50,7 +50,7 @@ def scaffold(
             f"{out_path} already exists. Use force=True to overwrite."
         )
 
-    doc_title = title or f"{meta['title']} — {project}"
+    doc_title = title or f"{meta['title']}: {project}"
     today = date.today().isoformat()
     content = _fill_placeholders(
         template_path.read_text(encoding="utf-8"),

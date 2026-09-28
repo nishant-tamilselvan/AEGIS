@@ -135,6 +135,19 @@ def test_changelog_bumps_version(tmp_path: Path):
     assert major == "1.0"
 
 
+def test_generated_titles_and_changelog_use_plain_punctuation(tmp_path: Path):
+    from datetime import date
+
+    path = scaffold("prd", tmp_path, project="Acme", templates_dir=TEMPLATES)
+    add_changelog(path, "Added scope section")
+    text = path.read_text(encoding="utf-8")
+    fm, body = split_document(text)
+    assert fm["title"] == "Product Requirements: Acme"
+    assert "# Product Requirements: Acme" in body
+    assert f"- {date.today().isoformat()}, v0.2: Added scope section" in body
+    assert "—" not in text
+
+
 # --------------------------------------------------------------------------- #
 # Architecture-phase artifacts
 # --------------------------------------------------------------------------- #
@@ -204,6 +217,22 @@ def test_interface_index_validates_and_ignores_contract_store(tmp_path: Path):
 
 def _adr_dir(tmp_path: Path) -> Path:
     return tmp_path / "architecture-decisions"
+
+
+def test_adr_empty_marker_is_a_hyphen_and_a_legacy_dash_still_validates(tmp_path: Path):
+    from artifact_tools.adr import create_adr, validate_adrs
+    from artifact_tools.frontmatter import render_document
+
+    adr_dir = _adr_dir(tmp_path)
+    path, _ = create_adr("Event driven topology", adr_dir, templates_dir=TEMPLATES)
+    fm, body = split_document(path.read_text(encoding="utf-8"))
+    assert fm["supersedes"] == ""
+    assert fm["superseded_by"] == "-"
+
+    # Records created before the change used an em dash; they must stay valid.
+    fm["supersedes"] = fm["superseded_by"] = "—"
+    path.write_text(render_document(fm, body), encoding="utf-8", newline="\n")
+    assert not [issue for issue in validate_adrs(adr_dir) if issue.severity == "error"]
 
 
 def test_adr_new_numbers_and_indexes(tmp_path: Path):

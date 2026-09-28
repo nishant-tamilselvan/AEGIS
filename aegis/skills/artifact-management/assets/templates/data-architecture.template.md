@@ -8,7 +8,7 @@ phase: 2
 owner: artifact-manager
 ---
 
-# Data Architecture — {{PROJECT_NAME}}
+# Data Architecture: {{PROJECT_NAME}}
 
 > How data is structured, owned and governed. Entities use the `DM-` prefix and
 > `implements` the functional requirements (`FR-*`) whose data they hold. Proposed by
@@ -16,9 +16,9 @@ owner: artifact-manager
 
 ## Legend
 
-- **Store**: `relational` | `document` | `key-value` | `object` | `cache` | `search`
-- **Classification**: `public` | `internal` | `confidential` | `pii` | `pci`
-- **Status**: `draft` | `in-review` | `approved` | `removed`
+- **Store.** `relational` | `document` | `key-value` | `object` | `cache` | `search`
+- **Classification.** `public` | `internal` | `confidential` | `pii` | `pci`
+- **Status.** `draft` | `in-review` | `approved` | `removed`
 
 ## 1. Logical Data Model (ERD)
 
@@ -58,4 +58,4 @@ _Where data must physically reside (e.g. Canada-only regions) and why._
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 2).
+- {{DATE}}, v0.1: Initial scaffold (phase 2).
