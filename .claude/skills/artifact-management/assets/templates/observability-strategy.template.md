@@ -8,7 +8,7 @@ phase: 2
 owner: artifact-manager
 ---
 
-# Observability Strategy — {{PROJECT_NAME}}
+# Observability Strategy: {{PROJECT_NAME}}
 
 > How the system is instrumented for production support from day one. Signals use the
 > `OBS-` prefix and `mitigates` the observability/reliability non-functional
@@ -17,8 +17,8 @@ owner: artifact-manager
 
 ## Legend
 
-- **Signal**: `log` | `metric` | `trace` | `alert`
-- **Status**: `draft` | `in-review` | `approved` | `removed`
+- **Signal.** `log` | `metric` | `trace` | `alert`
+- **Status.** `draft` | `in-review` | `approved` | `removed`
 
 ## 1. Logging Standards
 
@@ -34,8 +34,8 @@ Structured JSON logs with these mandatory fields on every entry:
 
 ## 2. Metrics & Tracing
 
-- **Metrics**: _the golden signals — latency, traffic, errors, saturation._
-- **Distributed tracing**: _propagation format (W3C Trace Context), sampling._
+- **Metrics.** _the golden signals: latency, traffic, errors, saturation._
+- **Distributed tracing.** _propagation format (W3C Trace Context), sampling._
 
 ## 3. Signal Catalogue
 
@@ -56,4 +56,4 @@ _Alert routing, severities, on-call ownership, and the first-response runbook li
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 2).
+- {{DATE}}, v0.1: Initial scaffold (phase 2).

@@ -74,7 +74,7 @@ def add_changelog(
     if phase is not None:
         frontmatter["phase"] = phase
 
-    entry = f"- {today} — v{new_version} — {summary}"
+    entry = f"- {today}, v{new_version}: {summary}"
     body = _insert_changelog_line(body, entry)
 
     path.write_text(render_document(frontmatter, body), encoding="utf-8", newline="\n")

@@ -8,7 +8,7 @@ phase: 2
 owner: artifact-manager
 ---
 
-# Security Architecture — {{PROJECT_NAME}}
+# Security Architecture: {{PROJECT_NAME}}
 
 > Threat model, identity, and data protection. Controls use the `SEC-` prefix and
 > `mitigates` the security non-functional requirements (`NFR-*`) they address.
@@ -16,8 +16,8 @@ owner: artifact-manager
 
 ## Legend
 
-- **Domain**: `iam` | `data-protection` | `network` | `app-sec` | `logging` | `compliance`
-- **Status**: `draft` | `in-review` | `approved` | `removed`
+- **Domain.** `iam` | `data-protection` | `network` | `app-sec` | `logging` | `compliance`
+- **Status.** `draft` | `in-review` | `approved` | `removed`
 
 ## 1. Data Classification
 
@@ -29,9 +29,9 @@ owner: artifact-manager
 
 ## 2. Identity & Access Management (IAM)
 
-- **Authentication**: _OIDC / OAuth2 / SAML — provider and flow._
-- **Authorization**: _RBAC / ABAC — roles, scopes, policy enforcement point._
-- **Token handling**: _JWT validation location, lifetime, rotation._
+- **Authentication.** _OIDC / OAuth2 / SAML: provider and flow._
+- **Authorization.** _RBAC / ABAC: roles, scopes, policy enforcement point._
+- **Token handling.** _JWT validation location, lifetime, rotation._
 
 ```mermaid
 sequenceDiagram
@@ -74,4 +74,4 @@ flowchart LR
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 2).
+- {{DATE}}, v0.1: Initial scaffold (phase 2).

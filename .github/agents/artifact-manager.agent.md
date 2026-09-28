@@ -23,6 +23,10 @@ other artifacts' cross-references to `ADR-*` ids valid.
 Always follow the [`artifact-management` skill](../skills/artifact-management/SKILL.md)
 procedure exactly.
 
+Write every sentence you add by the [`writing-style` skill](../skills/writing-style/SKILL.md).
+Before you validate, run its checker (`scripts/sloplint.py` in the skill folder) on each
+file you changed. Fix the errors in your own prose, and leave template structure alone.
+
 For phase 3 also follow
 [`implementation-management`](../skills/implementation-management/SKILL.md). Use only
 `python -m artifact_tools implementation ...` commands to initialize the pointer, create

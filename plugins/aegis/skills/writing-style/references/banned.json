@@ -1,0 +1,682 @@
+{
+  "_comment": "Single source of truth for the AEGIS writing-style rules. scripts/sloplint.py is the only reader. Severity: error = always slop, warn = context-dependent (a human decides). Patterns are case-insensitive Python regexes. Read SKILL.md before editing: every rule here was tested against real documents, and a rule that flags correct writing does more harm than the slop it catches.",
+  "words_error": [
+    "delve",
+    "delves",
+    "delved",
+    "delving",
+    "pivotal",
+    "groundbreaking",
+    "cutting-edge",
+    "game-changing",
+    "game-changer",
+    "transformative",
+    "seamless",
+    "seamlessly",
+    "multifaceted",
+    "holistic",
+    "holistically",
+    "tapestry",
+    "paradigm",
+    "synergy",
+    "synergies",
+    "elucidate",
+    "elucidates",
+    "elucidated",
+    "effortless",
+    "effortlessly",
+    "unlock",
+    "unlocks",
+    "unlocking",
+    "unlocked",
+    "crystallize",
+    "crystallizes",
+    "crystallized",
+    "crystallise",
+    "crystallises",
+    "interlocking",
+    "state-of-the-art",
+    "world-class",
+    "best-in-class",
+    "next-generation",
+    "next-gen"
+  ],
+  "words_warn": [
+    "robust",
+    "comprehensive",
+    "innovative",
+    "intricate",
+    "nuanced",
+    "vibrant",
+    "realm",
+    "landscape",
+    "journey",
+    "testament",
+    "crucial",
+    "navigate",
+    "navigating",
+    "underscore",
+    "underscores",
+    "unpack",
+    "harness",
+    "harnessing",
+    "leverage",
+    "leverages",
+    "leveraged",
+    "leveraging",
+    "streamlined",
+    "bolster",
+    "bolsters",
+    "bolstered",
+    "bolstering",
+    "foster",
+    "fosters",
+    "fostered",
+    "fostering",
+    "utilize",
+    "utilizes",
+    "utilized",
+    "utilizing",
+    "facilitate",
+    "facilitates",
+    "facilitated",
+    "facilitating",
+    "embark",
+    "embarks",
+    "embarked",
+    "embarking",
+    "endeavor",
+    "endeavors",
+    "endeavour",
+    "endeavours",
+    "encompass",
+    "encompasses",
+    "encompassing",
+    "empower",
+    "empowers",
+    "empowering",
+    "incentivize",
+    "incentivise",
+    "liaise",
+    "overarching",
+    "actually",
+    "essential",
+    "vital",
+    "significant",
+    "compound",
+    "amplify",
+    "amplifies",
+    "amplified",
+    "amplifying",
+    "ecosystem",
+    "fabric",
+    "ideate",
+    "operationalize",
+    "operationalise",
+    "ensure",
+    "ensures",
+    "ensuring"
+  ],
+  "phrases_error": [
+    {
+      "pattern": "in today'?s [\\w-]+ (world|era|environment|age)",
+      "label": "grand-opening"
+    },
+    {
+      "pattern": "it'?s (important|worth) (noting|to note)",
+      "label": "filler"
+    },
+    {
+      "pattern": "one of the most (important|significant|crucial|powerful|popular)",
+      "label": "empty-superlative"
+    },
+    {
+      "pattern": "when it comes to",
+      "label": "filler"
+    },
+    {
+      "pattern": "at its core",
+      "label": "filler"
+    },
+    {
+      "pattern": "at the end of the day",
+      "label": "filler"
+    },
+    {
+      "pattern": "this is where [\\w\\s]{1,40} comes in",
+      "label": "signpost"
+    },
+    {
+      "pattern": "let'?s break it down",
+      "label": "signpost"
+    },
+    {
+      "pattern": "let'?s (explore|dive|delve|unpack)",
+      "label": "signpost"
+    },
+    {
+      "pattern": "now we turn to",
+      "label": "signpost"
+    },
+    {
+      "pattern": "plays? a (crucial|critical|key|vital) role",
+      "label": "filler"
+    },
+    {
+      "pattern": "cannot be overstated",
+      "label": "drama"
+    },
+    {
+      "pattern": "shed(s|ding)? light on",
+      "label": "banned-idiom"
+    },
+    {
+      "pattern": "paves? the way",
+      "label": "banned-idiom"
+    },
+    {
+      "pattern": "harness(es|ing)? the (power|potential|full)",
+      "label": "banned-idiom"
+    },
+    {
+      "pattern": "navigat(e|ing) the (complexit|landscape|world|challenges)",
+      "label": "banned-idiom"
+    },
+    {
+      "pattern": "dives? (deep )?into",
+      "label": "banned-idiom"
+    },
+    {
+      "pattern": "stands? as a testament",
+      "label": "drama"
+    },
+    {
+      "pattern": "\\bhere'?s what you need to know\\b",
+      "label": "teaser-filler"
+    },
+    {
+      "pattern": "\\b(take|takes|taken|taking|took) a toll\\b",
+      "label": "take-a-toll"
+    },
+    {
+      "pattern": "\\bmeets? (them|you|people|families|students|patients|clients) where (they|you) are\\b",
+      "label": "meet-them-where-they-are"
+    },
+    {
+      "pattern": "\\bdue to the fact that\\b",
+      "label": "wordy-use-because"
+    },
+    {
+      "pattern": "\\bat this point in time\\b",
+      "label": "wordy-use-now"
+    },
+    {
+      "pattern": "\\bfor the purpose of \\w+ing\\b",
+      "label": "wordy-use-to"
+    },
+    {
+      "pattern": "\\bin the event that\\b",
+      "label": "wordy-use-if"
+    },
+    {
+      "pattern": "\\bin this (section|document|guide|article),? we (will|shall)\\b",
+      "label": "metadiscourse"
+    },
+    {
+      "pattern": "\\bin recent years,? (researchers|scholars|a growing number)\\b",
+      "label": "professional-narcissism"
+    },
+    {
+      "pattern": "\\bclose proximity\\b",
+      "label": "redundant-pair"
+    },
+    {
+      "pattern": "\\blow-hanging fruit\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\b(content|prose|text|writing|copy|mode|output|document|documents|section|everything) answers? to\\b",
+      "label": "abstraction-answers-to"
+    },
+    {
+      "pattern": "\\b(this|that|the) (decision point|point in time|juncture|workstream|piece of work)\\b",
+      "label": "vague-reference"
+    },
+    {
+      "pattern": "\\b(going|moving) forward\\b",
+      "label": "vague-reference"
+    },
+    {
+      "pattern": "\\bin due course\\b",
+      "label": "vague-reference"
+    },
+    {
+      "pattern": "\\b(as|where) appropriate\\b",
+      "label": "vague-reference"
+    },
+    {
+      "pattern": "\\bat this (stage|time|juncture)\\b",
+      "label": "vague-reference"
+    },
+    {
+      "pattern": "^\\s*(delay|failure|inaction|non-compliance|noncompliance)\\b[^.]{0,40}\\b(costs?|means?|risks?|results?)\\b",
+      "label": "process-as-actor"
+    },
+    {
+      "pattern": "\\b(delay|failure|inaction) (past|beyond|to meet)\\b",
+      "label": "process-as-actor"
+    },
+    {
+      "pattern": "\\bin (a|the) world (where|of)\\b",
+      "label": "grand-opening"
+    },
+    {
+      "pattern": "\\bit is also worth (noting|mentioning|saying)\\b",
+      "label": "filler"
+    },
+    {
+      "pattern": "\\b(in essence|fundamentally),",
+      "label": "filler-opener"
+    },
+    {
+      "pattern": "\\bmove(s|d)? the needle\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bdriv(e|es|ing) impact\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\btee(s|d)? up\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bmutually reinforcing\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bthis (marks|represents|signals|heralds|ushers in)\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\ba (step change|sea change|paradigm shift|turning point|watershed|inflection point)\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\b(sets?|lays?|laid) the (stage|groundwork|foundation) for\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\bopens? the door (to|for)\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\bmarks a (new|significant|major|critical)\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\bthe first of its kind\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\ba force multiplier\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\bconnect(s|ing|ed)? the dots\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bthe tip of the iceberg\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\brais(e|es|ed|ing) the bar\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bdoubl(e|es|ed|ing) down\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\btable stakes\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bboil the ocean\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bsingle pane of glass\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bnorth star\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bunlock(s|ing|ed)? (value|potential|capacity|efficiency|savings)\\b",
+      "label": "metaphoric-announcement"
+    },
+    {
+      "pattern": "\\bthe (last|final) mile\\b",
+      "label": "dead-metaphor"
+    },
+    {
+      "pattern": "\\bfront and (c|ce)ent(er|re)\\b",
+      "label": "dead-metaphor"
+    }
+  ],
+  "phrases_warn": [
+    {
+      "pattern": "\\b(research|studies|evidence|the data) (shows?|suggests?|indicates?|proves?)\\b",
+      "label": "unnamed-research-appeal"
+    },
+    {
+      "pattern": "\\bat the intersection of\\b",
+      "label": "intersection-framing"
+    },
+    {
+      "pattern": "\\bthan you (might )?(think|realize|expect)\\b",
+      "label": "presumes-reader-assumption"
+    },
+    {
+      "pattern": "\\b(all in one place|single window into|one[- ]stop shop)\\b",
+      "label": "one-stop-marketing"
+    },
+    {
+      "pattern": "\\bremains? (deeply |fully |firmly )?committed to\\b",
+      "label": "empty-commitment"
+    },
+    {
+      "pattern": "\\b(register|sign up|enroll|apply|check|call|visit|start|act)\\b[^.!?\\n]{0,40}\\btoday\\b",
+      "label": "cta-today-urgency"
+    },
+    {
+      "pattern": "\\btogether,? these (steps|measures|actions|changes|efforts|investments)\\b",
+      "label": "together-these-steps"
+    },
+    {
+      "pattern": "\\b(time|the season|the seasons|the clock|the window|deadlines?|opportunit(y|ies))\\s+(won'?t|will not|doesn'?t) wait\\b",
+      "label": "wont-wait-urgency"
+    },
+    {
+      "pattern": "\\bskip the (\\w+ )?(rush|line(up)?|queue|crowds?|hassle|paperwork)\\b",
+      "label": "skip-the-rush"
+    },
+    {
+      "pattern": "\\bwants? your (voice|input|feedback|say)\\b",
+      "label": "wants-your-voice"
+    },
+    {
+      "pattern": "\\bthe (commitment|promise|pledge) (i am|i'?m|we are|we'?re) making\\b",
+      "label": "commitment-i-am-making"
+    },
+    {
+      "pattern": "\\bwill (see|know) exactly (how|what|where|who)\\b",
+      "label": "exactly-transparency-flourish"
+    },
+    {
+      "pattern": "\\bthe fastest (route|way|path|option) is\\b",
+      "label": "uncheckable-fastest-superlative"
+    },
+    {
+      "pattern": "\\b(get|buy|grab|claim|secure|reserve) your\\b[^.!?\\n]{0,40}\\b(now|today)\\b",
+      "label": "urgency-cta-now"
+    },
+    {
+      "pattern": "\\b(buy|order|book|register|enter|sign up) early (and|to) save\\b",
+      "label": "buy-early-save"
+    },
+    {
+      "pattern": "\\b(pay|pays|paid|cost|costs)\\b[^.!?\\n]{0,15}\\ba (single )?(cent|dime|penny|nickel)\\b",
+      "label": "not-a-cent"
+    },
+    {
+      "pattern": "\\b(stands? to )?(gains?|benefits?) the most\\b",
+      "label": "stand-to-gain-most"
+    },
+    {
+      "pattern": "\\b(in order to|prior to|subsequent to|with regard to)\\b",
+      "label": "wordy-phrase"
+    },
+    {
+      "pattern": "\\bnot un\\w{3,}\\b",
+      "label": "double-negative"
+    },
+    {
+      "pattern": "\\b(e\\.g\\.|i\\.e\\.)",
+      "label": "latin-abbreviation"
+    },
+    {
+      "pattern": "\\bkeeps? (?:\\w+ ){1,3}honest\\b",
+      "label": "person-keeps-honest"
+    },
+    {
+      "pattern": "\\b(guards?|shields?) \\w+ from\\b",
+      "label": "person-guards"
+    },
+    {
+      "pattern": "\\bearns? (its|their) (place|keep)\\b",
+      "label": "person-earns"
+    },
+    {
+      "pattern": "\\bstands? convicted of\\b",
+      "label": "person-convicted"
+    },
+    {
+      "pattern": "\\b(faces?|survives?) the (gates?|test|panel|judge)\\b",
+      "label": "person-faces"
+    },
+    {
+      "pattern": "\\b(bows?|defers?) to\\b",
+      "label": "person-defers"
+    },
+    {
+      "pattern": "\\bdoes the (real )?work\\b",
+      "label": "person-does-work"
+    },
+    {
+      "pattern": "\\bholds? the line\\b",
+      "label": "person-holds-line"
+    },
+    {
+      "pattern": "\\blives? under\\b",
+      "label": "person-lives-under"
+    },
+    {
+      "pattern": "\\banswers? to (a|the|its)\\b",
+      "label": "person-answers-to"
+    },
+    {
+      "pattern": "\\b(exists?|is there|are there) (for th|to (handle|cover|catch|deal))",
+      "label": "person-exists-for"
+    },
+    {
+      "pattern": "\\bat scale\\b",
+      "label": "jargon-at-scale"
+    },
+    {
+      "pattern": "\\bline of sight\\b",
+      "label": "jargon-line-of-sight"
+    },
+    {
+      "pattern": "\\bbake(d|s)? (it |this |that )?in(to)? the\\b",
+      "label": "jargon-baked-in"
+    }
+  ],
+  "openers_error": [
+    {
+      "pattern": "^(great|excellent|good|fascinating|interesting) (question|point|idea)",
+      "label": "sycophant-opener"
+    },
+    {
+      "pattern": "^certainly[.!,]",
+      "label": "sycophant-opener"
+    },
+    {
+      "pattern": "^i'?d be happy to",
+      "label": "sycophant-opener"
+    },
+    {
+      "pattern": "^what a ",
+      "label": "sycophant-opener"
+    }
+  ],
+  "structures_error": [
+    {
+      "pattern": "\\b(it'?s|this is|that'?s|we'?re) not (just|only|simply|merely) [^.!?\\n]{0,100}\\b(it'?s|but)\\b",
+      "label": "not-just-its"
+    },
+    {
+      "pattern": "\\bnot about [^.!?\\n]{0,60}\\bit'?s about\\b",
+      "label": "not-just-its"
+    },
+    {
+      "pattern": "^\\s*[-*•]\\s+\\*\\*[^*\\n]{1,60}(:\\*\\*|\\*\\*\\s*[:：])",
+      "label": "bold-colon-bullet"
+    },
+    {
+      "pattern": "\\bonly ever (click|need|see|touch|open|read)\\b",
+      "label": "paraprosdokian"
+    },
+    {
+      "pattern": "\\bthe (very )?same \\w+ that\\b[^.!?\\n]{0,80}\\b(moderniz|transform|revolutioniz|reinvent|reimagin|empower)\\w*[^.!?\\n]{0,40}\\bitself\\b",
+      "label": "self-congratulation"
+    },
+    {
+      "pattern": "^#{1,6}\\s*(why (it|this) matters|the bigger picture|get started today)\\s*$",
+      "label": "stock-dramatic-heading"
+    },
+    {
+      "pattern": "\\bno more [^.!?\\n]{2,50}[.!?]\\s*no more\\b",
+      "label": "no-more-anaphora"
+    },
+    {
+      "pattern": "\\bthat('| i)s (the reason|why) we('| a)re here\\b",
+      "label": "here-today-stagesetting"
+    },
+    {
+      "pattern": "^#{1,6}\\s*why\\s+[\\w -]{1,30},\\s*why\\s+now\\b",
+      "label": "why-x-why-now-heading"
+    },
+    {
+      "pattern": "(^|[.!?] )(two|three|four|five|six|seven|several|a few) \\w+( \\w+)? (scope|cover|drive|matter|follow|emerge|emerged|stand out|explain|define|shape|remain|apply|come out|do (this|that|the work)|from the \\w+)\\b[^.!?\\n]{0,25}[.!?]",
+      "label": "counting-announcement"
+    },
+    {
+      "pattern": "^(the\\s+)?(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|\\d{1,3})([\\s-](one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|\\d{1,3}))?\\s+(ways?|reasons?|lessons?|habits?|places?|rules?|secrets?|tips?|tricks?|takeaways?|mistakes?|truths?|insights?|principles?|factors?|moments?|signs?|myths?)\\s+((that|which|it|they|you|we|i)|to|the|every|any)\\s+[\\w'-]+([\\s,]+[\\w'-]+){0,6}$",
+      "label": "listicle-heading"
+    },
+    {
+      "pattern": "^(the\\s+)?(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)([\\s-](one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred))?\\s+[\\w'-]+\\s+(that|which|it|they|you|we|i)\\s+[\\w'-]+([\\s,]+[\\w'-]+){0,6}$",
+      "label": "listicle-heading-clause"
+    },
+    {
+      "pattern": "^(the\\s+)?(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|twenty|thirty|forty|fifty|\\d{1,3})\\s+[\\w'-]+\\s+(does|do|makes?|gives?|holds?|carries|carry|delivers?|explains?|covers?)\\s+(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|twenty|thirty|forty|fifty|\\d{1,3})\\b[^.!?\\n]{0,30}$",
+      "label": "listicle-heading-verb"
+    },
+    {
+      "pattern": "^[^.!?\\n]{5,45},\\s*and\\s+(what|why|how|where|who|which)\\s+(it|they|we|you|i)\\s+[\\w'-]+([\\s,]+[\\w'-]+){0,4}$",
+      "label": "teaser-tail-heading"
+    },
+    {
+      "pattern": "^[^.!?\\n,]{2,40},\\s*(in|with|by)\\s+(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|twenty|thirty|forty|fifty|hundred)([\\s-](one|two|three|four|five|six|seven|eight|nine|ten))?\\s+[\\w'-]+$",
+      "label": "count-hook-heading"
+    },
+    {
+      "pattern": "^(how|why|where|what|when)\\s+(the\\s+)?(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|twenty|thirty|forty|fifty|hundred)([\\s-](one|two|three|four|five|six|seven|eight|nine|ten))?\\s+[\\w'-]+(\\s+[\\w'-]+){0,5}$",
+      "label": "count-question-heading"
+    },
+    {
+      "pattern": "^[^.!?\\n]{5,45},\\s*(classified|explained|measured|revealed|compared|ranked|decoded|unpacked|demystified|simplified|reconsidered|revisited)$",
+      "label": "heading-participial-tail"
+    },
+    {
+      "pattern": "^(everything|all|anything|nothing)\\s+(that|you|we|i|which)\\s+[\\w'-]+([\\s,]+[\\w'-]+){0,5}$",
+      "label": "withheld-subject-heading"
+    },
+    {
+      "pattern": "^what\\s+(to\\s+[\\w'-]+|has\\s+to|you\\s+(need|should|must|will)|i\\s+actually|we\\s+actually)\\b[^.!?\\n]{0,50}$",
+      "label": "reader-directive-heading"
+    }
+  ],
+  "structures_warn": [
+    {
+      "pattern": "\\bnot only\\b[^.!?\\n]{0,80}\\bbut (also )?\\b",
+      "label": "not-only-but"
+    },
+    {
+      "pattern": ",\\s*and (you'?ll |you )?only ",
+      "label": "paraprosdokian-shape"
+    },
+    {
+      "pattern": "\\bthe (very )?same \\w+ that\\b",
+      "label": "callback-flex"
+    },
+    {
+      "pattern": "\\b(moderniz\\w+|transform\\w*|reinvent\\w*|revolutioniz\\w+|reimagin\\w+|chang\\w+)[^.!?\\n]{0,40}\\bitself\\b",
+      "label": "grand-reflexive"
+    },
+    {
+      "pattern": "^#{1,6}\\s*\\w+(er|ier)\\s+\\w+,\\s*\\w+(er|ier)\\s+\\w+\\s*$",
+      "label": "paired-comparative-heading"
+    },
+    {
+      "pattern": "\\bready to (start|begin|get started|apply|register|join|go)\\b[^.!?\\n]{0,30}\\?",
+      "label": "rhetorical-question-cta"
+    },
+    {
+      "pattern": "\\b(?:will\\s+)?shapes?\\s+(?:every\\s+\\w+|how\\s+(?:the|we|you|each)\\b|the\\s+future)",
+      "label": "grand-shaping-claim"
+    },
+    {
+      "pattern": "\\bwhether you'?re an? \\w+[^.!?\\n]{0,60}\\bor \\b",
+      "label": "audience-enumeration"
+    },
+    {
+      "pattern": "\\beverything from [^.!?\\n]{3,60} to ",
+      "label": "pseudo-comprehensive-range"
+    },
+    {
+      "pattern": ",\\s*(ensuring|enabling|empowering|allowing|streamlining|enhancing|unlocking) [^.!?\\n]{0,60}[.!?]\\s*$",
+      "label": "gerund-benefit-chain"
+    },
+    {
+      "pattern": "^\\s*(in (conclusion|summary|short)\\b|to (conclude|sum up)\\b|ultimately,|overall,)",
+      "label": "canned-conclusion"
+    },
+    {
+      "pattern": "^\\s*(moreover|furthermore|additionally),",
+      "label": "paragraph-initial-connective"
+    },
+    {
+      "pattern": "^\\s*(there (is|are) [^.!?\\n]{5,50} (that|which)|it is (important|worth|essential|critical) to)\\b",
+      "label": "expletive-opening"
+    },
+    {
+      "pattern": "\\b(answers?|solves?|addresses?|covers?|handles?|fixes|does) (both|all|three|two|this|these|the) [^.!?\\n]{0,30}: (it|they|you|we) ",
+      "label": "cataphoric-announcement"
+    },
+    {
+      "pattern": "\\b(the|a|an|every|each|any|this|that|those|these)\\s+[\\w'-]+\\s+(that|which|it|they|we|you|i)\\s+(needs?|wants?|holds?|carries|carry|uses?|makes?|does|do|gives?|takes?|sees?|reads?|writes?|cites?|answers?|covers?|serves?|supports?|produced?|created?|built|wrote|found|left|kept)\\s*[.!?]?$",
+      "label": "verb-final-relative"
+    },
+    {
+      "pattern": "^[^.!?\\n]{15,}\\b(that|which|it|they|we|you|i)\\s+[\\w'-]+\\s+(about|at|for|from|to|with|on|in|into|through|under|over|by)\\s*[.!?]?$",
+      "label": "terminal-stranded-preposition"
+    },
+    {
+      "pattern": "\\b(is|are|was|were|be|been|being)\\s+(dropped|removed|deleted|enforced|computed|recorded|checked|validated|written|drafted|applied|required|considered|maintained|leveraged|utilized|utilised|ensured|facilitated|addressed|undertaken|actioned)\\s*[.!?]?$",
+      "label": "terminal-agentless-passive"
+    }
+  ],
+  "limits": {
+    "em_dash_max": 1,
+    "sentence_words_warn": 30,
+    "sentence_words_error": 40,
+    "cadence_min_sentences": 8,
+    "cadence_cv_floor": 0.28,
+    "personification_per_1k": 2.5
+  }
+}

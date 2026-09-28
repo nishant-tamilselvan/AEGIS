@@ -33,6 +33,10 @@ them. You power the workflow's self-correction loop.
      the [`enterprise-standards` skill](../skills/enterprise-standards/SKILL.md) to confirm via
      `enterprise-standards-server` that it exists, is `Approved`, and is not superseded or
      `Overdue`; flag anything relying on stale or superseded guidance.
+   - **Readability**: run the [`writing-style` skill](../skills/writing-style/SKILL.md)
+     checker on each changed artifact. Report its errors as advisory findings, and skip
+     errors in template structure. Treat prose a non-specialist cannot follow, most of all
+     in `executive-briefing.md`, as blocking.
    - **Implementation remediation**: confirm a phase-3 blocker is resolved across every
      affected artifact, native contract and ADR; no new contradiction or scope was added;
      and report the exact validated versions implementation packages must refresh.

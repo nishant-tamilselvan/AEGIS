@@ -8,7 +8,7 @@ phase: 1
 owner: artifact-manager
 ---
 
-# User Journey Map — {{PROJECT_NAME}}
+# User Journey Map: {{PROJECT_NAME}}
 
 > Personas and their end-to-end journeys. Journey steps use the `UJ-` prefix and are
 > referenced by functional requirements via `traces_to`.
@@ -42,4 +42,4 @@ journey
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 1).
+- {{DATE}}, v0.1: Initial scaffold (phase 1).

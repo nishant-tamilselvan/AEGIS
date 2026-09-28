@@ -138,6 +138,8 @@ the implementation tooling:
    Each organization connects its own library; see `docs/enterprise-standards-setup.md`.
 - `implementation-management` — readiness, work-package state, decision escalation,
    traceability, evidence, drift and release gating.
+- `writing-style` — plain, readable prose for every artifact, ADR, work package, commit
+   and pull request, with a rule file and a checker script (`scripts/sloplint.py`).
 
 ## Platforms
 

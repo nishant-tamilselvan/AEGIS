@@ -64,7 +64,7 @@ The other commands are `/add-requirement`, `/add-adr`, `/run-review-cycle`,
 | Orchestrators (ideation, architecture, implementation) | Run **in your main conversation**. Each phase command loads the orchestrator's role, so it can talk to you and ask questions with AskUserQuestion. |
 | Specialists (`artifact-manager`, `data-architect`, `service-implementer`, ...) | **Subagents** that the orchestrator delegates to with the Agent tool. They cannot talk to you directly. When one needs a decision, it says so in its final report and the orchestrator asks you. |
 | Prompts | **Slash-command skills** in `.claude/skills/<name>/`. They run only when you type them. |
-| Skills (`artifact-management`, `adr-management`, `implementation-management`, `enterprise-standards`) | **Skills** in `.claude/skills/`, loaded when a task needs them. |
+| Skills (`artifact-management`, `adr-management`, `implementation-management`, `enterprise-standards`, `writing-style`) | **Skills** in `.claude/skills/`, loaded when a task needs them. |
 | Hooks | `.claude/settings.json`, calling the same `scripts/implementation_guard.py` and `scripts/validate_hook.py` as Copilot. |
 | MCP server | `.mcp.json` (copy it from `.mcp.example.json`). |
 

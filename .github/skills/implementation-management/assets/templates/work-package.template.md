@@ -18,7 +18,7 @@ evidence_count: 0
 ---
 <!-- markdownlint-disable MD025 MD060 -->
 
-# {{ID}} — {{TITLE}}
+# {{ID}}: {{TITLE}}
 
 ## Scope
 
@@ -54,4 +54,4 @@ package enters review. Use `Not applicable` only with a reason.
 
 | Date | From | To | Actor | Note |
 |---|---|---|---|---|
-| {{DATE}} | — | planned | artifact-manager | Work package created. |
+| {{DATE}} | - | planned | artifact-manager | Work package created. |

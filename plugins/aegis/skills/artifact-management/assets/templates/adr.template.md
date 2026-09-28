@@ -11,12 +11,14 @@ deciders: "{{DECIDERS}}"
 
 # {{ADR_ID}}: {{TITLE}}
 
-- **Status:** {{STATUS}}
-- **Date:** {{DATE}}
-- **Component/Domain:** {{COMPONENT}}
-- **Deciders:** {{DECIDERS}}
-- **Supersedes:** {{SUPERSEDES}}
-- **Superseded by:** {{SUPERSEDED_BY}}
+| Field | Value |
+| --- | --- |
+| Status | {{STATUS}} |
+| Date | {{DATE}} |
+| Component/Domain | {{COMPONENT}} |
+| Deciders | {{DECIDERS}} |
+| Supersedes | {{SUPERSEDES}} |
+| Superseded by | {{SUPERSEDED_BY}} |
 
 ## Context
 
@@ -30,9 +32,9 @@ _What is the issue that motivates this decision? Reference the driving requireme
 
 ## Considered Alternatives
 
-1. **_Option A_** — _pros / cons._
-2. **_Option B_** — _pros / cons._
-3. **_Option C_** — _pros / cons._
+1. **_Option A_**: _pros / cons._
+2. **_Option B_**: _pros / cons._
+3. **_Option C_**: _pros / cons._
 
 ## Decision
 

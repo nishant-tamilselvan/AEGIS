@@ -9,7 +9,7 @@ owner: artifact-manager
 ---
 <!-- markdownlint-disable MD025 MD060 -->
 
-# Implementation Decisions — {{PROJECT_NAME}}
+# Implementation Decisions: {{PROJECT_NAME}}
 
 Use this append-only ledger for reversible tactical choices. Material choices must link
 to an ADR and any affected source artifacts before implementation resumes.
@@ -20,4 +20,4 @@ to an ADR and any affected source artifacts before implementation resumes.
 ## Changelog
 
 <!-- artifact_tools implementation commands append here -->
-- {{DATE}} — v0.1 — Initial implementation decision ledger.
+- {{DATE}}, v0.1: Initial implementation decision ledger.

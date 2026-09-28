@@ -173,7 +173,7 @@ def _bump_version(frontmatter: dict) -> None:
 
 
 def _append_changelog(body: str, summary: str, version: str) -> str:
-    line = f"- {_today()} — v{version} — {summary.strip().rstrip('.')}.\n"
+    line = f"- {_today()}, v{version}: {summary.strip().rstrip('.')}.\n"
     marker = "<!-- artifact_tools implementation commands append here -->"
     if marker in body:
         return body.replace(marker, marker + "\n" + line.rstrip("\n"), 1)
@@ -240,7 +240,7 @@ def init_implementation(
     name = project or app.name.replace("-", " ").title()
     replacements = {
         "PROJECT_NAME": name,
-        "TITLE_YAML": _yaml_scalar(f"Implementation — {name}"),
+        "TITLE_YAML": _yaml_scalar(f"Implementation: {name}"),
         "DATE": _today(),
         "TARGET_WORKSPACE_YAML": _yaml_scalar(str(target)),
         "TARGET_BRANCH_YAML": _yaml_scalar(target_branch),
@@ -249,7 +249,7 @@ def init_implementation(
     }
     decision_replacements = {
         "PROJECT_NAME": name,
-        "TITLE_YAML": _yaml_scalar(f"Implementation Decisions — {name}"),
+        "TITLE_YAML": _yaml_scalar(f"Implementation Decisions: {name}"),
         "DATE": _today(),
     }
     pointer_text = _render_template(templates / "implementation.template.md", replacements)
@@ -362,7 +362,7 @@ def create_work_package(
 
 
 def _append_status_history(body: str, old: str, new: str, actor: str, note: str) -> str:
-    row = f"| {_today()} | {old} | {new} | {_escape_cell(actor)} | {_escape_cell(note or '—')} |"
+    row = f"| {_today()} | {old} | {new} | {_escape_cell(actor)} | {_escape_cell(note or '-')} |"
     heading = "## Status History"
     if heading not in body:
         raise ValueError("Work package is missing the Status History section")
@@ -434,7 +434,7 @@ def record_evidence(
         raise ValueError("Evidence outcome must be 'pass' or 'fail'")
     path, fm, body = _find_work_package(app_dir, work_package_id)
     row = (
-        f"| {_today()} | {_escape_cell(command)} | {outcome} | {_escape_cell(details or '—')} |"
+        f"| {_today()} | {_escape_cell(command)} | {outcome} | {_escape_cell(details or '-')} |"
     )
     marker = "## Status History"
     if marker not in body:
@@ -455,7 +455,7 @@ def _append_pointer_verification(
     fm, body = _load_document(pointer)
     row = (
         f"| {_today()} | {work_package_id} | {_escape_cell(command)} | {outcome} | "
-        f"{_escape_cell(details or '—')} |"
+        f"{_escape_cell(details or '-')} |"
     )
     marker = "## Changelog"
     if marker not in body:
@@ -483,13 +483,13 @@ def add_decision(
     question: str,
     decision: str,
     rationale: str,
-    work_package: str = "—",
+    work_package: str = "-",
     decision_type: str = "tactical",
     status: str = "accepted",
     sources: Iterable[str] = (),
     affected_paths: Iterable[str] = (),
     approver: str = "",
-    adr: str = "—",
+    adr: str = "-",
     supersedes: str | None = None,
 ) -> str:
     """Append a tactical decision, or a material decision linked to an ADR."""
@@ -516,9 +516,9 @@ def add_decision(
             question,
             decision,
             rationale,
-            ", ".join(sources) or "—",
-            ", ".join(_normalise_target_path(item) for item in affected_paths) or "—",
-            approver or "—",
+            ", ".join(sources) or "-",
+            ", ".join(_normalise_target_path(item) for item in affected_paths) or "-",
+            approver or "-",
             adr,
         )
     ) + " |"
@@ -586,8 +586,8 @@ def reconcile_pointer(app_dir: str | Path, *, summary: str = "Reconciled impleme
         source_versions.update(wp_fm.get("source_versions") or {})
     fm["source_versions"] = dict(sorted(source_versions.items()))
 
-    active_value = ", ".join(active) if active else "—"
-    next_value = eligible[0] if eligible else "—"
+    active_value = ", ".join(active) if active else "-"
+    next_value = eligible[0] if eligible else "-"
     release_value = "Approved" if fm.get("release_approved") else "Not ready"
     body = _replace_table_rows(
         body,
@@ -601,8 +601,8 @@ def reconcile_pointer(app_dir: str | Path, *, summary: str = "Reconciled impleme
 
     index_rows = []
     for path, wp_fm, _ in documents:
-        deps = ", ".join(wp_fm.get("dependencies") or ()) or "—"
-        paths = "<br>".join(_escape_cell(item) for item in wp_fm.get("target_paths") or ()) or "—"
+        deps = ", ".join(wp_fm.get("dependencies") or ()) or "-"
+        paths = "<br>".join(_escape_cell(item) for item in wp_fm.get("target_paths") or ()) or "-"
         index_rows.append(
             f"| {wp_fm.get('id')} | {_escape_cell(wp_fm.get('title', ''))} | {wp_fm.get('status')} | "
             f"{deps} | {paths} | [{path.name}](work-packages/{path.name}) |"
@@ -673,13 +673,13 @@ def approve_release(app_dir: str | Path, *, approver: str, note: str = "") -> Pa
     fm["release_approved_on"] = _today()
     fm["release_approval_note"] = note.strip()
     active = fm.get("active_work_package")
-    active_value = ", ".join(active) if isinstance(active, list) else (active or "—")
+    active_value = ", ".join(active) if isinstance(active, list) else (active or "-")
     body = _replace_table_rows(
         body,
         "## Current State",
         [
             f"| Active work package | {active_value} |",
-            f"| Next work package | {fm.get('next_work_package') or '—'} |",
+            f"| Next work package | {fm.get('next_work_package') or '-'} |",
             "| Release readiness | Approved |",
         ],
     )

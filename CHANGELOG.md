@@ -7,6 +7,26 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+### Added
+
+- A `writing-style` skill. It sets the rules for plain, readable prose in artifacts,
+  ADRs, work packages, commits and pull requests. It ships a rule file
+  (`references/banned.json`) and a checker, `scripts/sloplint.py`. `artifact-manager` and
+  `adr-author` run the checker on what they write, and `critic-reviewer` reports its
+  errors as advisory findings.
+
+### Changed
+
+- Every artifact, ADR and implementation template now passes the `writing-style`
+  checker, and a test keeps it that way. Label and value bullets became tables or
+  labels ending in a period, and em dashes in placeholder text became colons.
+- The CLI writes plain punctuation. New document titles read `Data Architecture: <name>`
+  instead of using an em dash. New changelog lines read `- 2026-09-28, v0.2: Summary`.
+  Empty table cells and ADR `supersedes` / `superseded_by` values use `-`. Existing
+  artifacts keep their old lines and still validate, because the ADR check accepts
+  both `-` and the em dash. Update any script of your own that parses the old
+  changelog line or the em dash placeholder.
+
 ## [0.1.2] - 2026-09-24
 
 A security fix for the implementation guard, and a documentation site.

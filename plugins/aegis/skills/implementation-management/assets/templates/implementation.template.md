@@ -17,7 +17,7 @@ source_versions: {}
 ---
 <!-- markdownlint-disable MD025 MD060 -->
 
-# Implementation — {{PROJECT_NAME}}
+# Implementation: {{PROJECT_NAME}}
 
 This is the canonical phase-3 pointer. Detailed execution records live in
 [`work-packages/`](work-packages/) and tactical decisions in [`decision.md`](decision.md).
@@ -26,8 +26,8 @@ This is the canonical phase-3 pointer. Detailed execution records live in
 
 | Field | Value |
 |---|---|
-| Active work package | — |
-| Next work package | — |
+| Active work package | - |
+| Next work package | - |
 | Release readiness | Not ready |
 
 ## Work Package Index
@@ -47,4 +47,4 @@ This is the canonical phase-3 pointer. Detailed execution records live in
 ## Changelog
 
 <!-- artifact_tools implementation commands append here -->
-- {{DATE}} — v0.1 — Initial implementation pointer.
+- {{DATE}}, v0.1: Initial implementation pointer.

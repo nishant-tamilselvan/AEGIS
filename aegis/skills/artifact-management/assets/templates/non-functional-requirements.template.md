@@ -8,16 +8,16 @@ phase: 1
 owner: artifact-manager
 ---
 
-# Non-Functional Requirements — {{PROJECT_NAME}}
+# Non-Functional Requirements: {{PROJECT_NAME}}
 
 > Quality attributes: performance, security, reliability, usability, maintainability,
 > compliance. Each NFR is measurable. IDs use the `NFR-` prefix.
 
 ## Legend
 
-- **Category**: `performance` | `security` | `reliability` | `usability` |
+- **Category.** `performance` | `security` | `reliability` | `usability` |
   `maintainability` | `scalability` | `compliance` | `observability`
-- **Status**: `draft` | `in-review` | `approved` | `removed`
+- **Status.** `draft` | `in-review` | `approved` | `removed`
 
 ## Requirements
 
@@ -35,4 +35,4 @@ owner: artifact-manager
 ## Changelog
 
 <!-- artifact_tools changelog appends here -->
-- {{DATE}} — v0.1 — Initial scaffold (phase 1).
+- {{DATE}}, v0.1: Initial scaffold (phase 1).
