@@ -68,6 +68,7 @@ nav:
       - CLI reference: cli-reference.md
       - Applications index: artifacts/README.md
   - Enterprise Standards setup: enterprise-standards-setup.md
+  - Customizing AEGIS: customizing.md
   - Troubleshooting: troubleshooting.md
 
 markdown_extensions:

@@ -12,6 +12,7 @@ These guides are also published, with search, as the
 | [Agents, prompts and skills](agents.md) | Find which agent does what and which prompt starts it. |
 | [CLI reference](cli-reference.md) | Scaffold, validate and manage artifacts, ADRs and implementation state from the terminal. |
 | [Enterprise Standards setup](enterprise-standards-setup.md) | Connect your organization's standards library. |
+| [Customizing AEGIS](customizing.md) | Run your own edition with `aegis.config.yaml` and an overlay folder, without editing core files. |
 | [Troubleshooting](troubleshooting.md) | Fix validation errors, blocked readiness and guard denials. |
 | [Applications index](artifacts/README.md) | See how per-application artifact folders are laid out. |
 

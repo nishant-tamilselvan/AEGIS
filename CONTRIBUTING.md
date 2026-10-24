@@ -117,7 +117,7 @@ If you work on AEGIS for an organization, list that organization's private terms
 | `plugins/aegis/`, `.claude-plugin/marketplace.json` | Generated Claude Code plugin and marketplace, including copies of the hook scripts and `artifact_tools`. Do not edit. |
 | `.github/hooks/`, `.claude/settings.json`, `plugins/aegis/hooks/hooks.json` | Hook configuration for Copilot, a Claude Code clone and the plugin. All call the same scripts. |
 | `CLAUDE.md` | Claude Code entry point. Imports the golden rules and `AGENTS.md`. |
-| `src/artifact_tools/` | The CLI: scaffold, validate, ADRs, implementation state and the guard. |
+| `src/artifact_tools/` | The CLI: scaffold, validate, ADRs, implementation state and the guard. `config.py` reads the optional `aegis.config.yaml`. |
 | `scripts/` | Hook entry points and CI checks. |
 | `examples/enterprise-standards-server/` | Reference MCP server and sample standards. |
 | `docs/` | User documentation. |
@@ -165,6 +165,17 @@ platform:
 
 - [ ] Frontmatter `name` matches the folder name, and `description` says when to load it.
 - [ ] Referenced files (templates, references) exist. The `links` check verifies this.
+
+### Extension point (`aegis.config.yaml`, `src/artifact_tools/config.py`)
+
+- [ ] Without a config file, `python scripts/sync_platforms.py --check` passes and the
+      generated files are unchanged. A new key never changes the default output.
+- [ ] The new key is validated in `src/artifact_tools/config.py`: unknown keys, wrong
+      types and clashes with built-in names fail with a message that names the key.
+- [ ] `tests/test_customizing.py` covers the default, a working example and each
+      failure path.
+- [ ] Examples use `example-org` and `example-app`, never a real organization.
+- [ ] [Customizing AEGIS](docs/customizing.md) documents the key.
 
 ### Artifact template (`aegis/skills/artifact-management/assets/templates/`)
 

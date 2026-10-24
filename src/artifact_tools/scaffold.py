@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from artifact_tools.constants import ARTIFACT_TYPES, resolve_type
+from artifact_tools.constants import ARTIFACT_TEMPLATES, ARTIFACT_TYPES, resolve_type
 from artifact_tools.frontmatter import find_templates_dir
 from artifact_tools.interfaces import init_interfaces_dir
 
@@ -39,8 +39,11 @@ def scaffold(
     type_key = resolve_type(type_name)
     meta = ARTIFACT_TYPES[type_key]
 
-    templates = templates_dir or find_templates_dir()
-    template_path = templates / f"{type_key}.template.md"
+    if type_key in ARTIFACT_TEMPLATES and templates_dir is None:
+        template_path = ARTIFACT_TEMPLATES[type_key]
+    else:
+        templates = templates_dir or find_templates_dir()
+        template_path = templates / f"{type_key}.template.md"
     if not template_path.is_file():
         raise FileNotFoundError(f"Template not found: {template_path}")
 

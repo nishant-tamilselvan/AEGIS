@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from artifact_tools.constants import ARTIFACT_TYPES
+from artifact_tools.constants import ARTIFACT_TYPES, OPTIONAL_ARTIFACT_TYPES
 from artifact_tools.frontmatter import DEFINED_ID_RE
 from artifact_tools.implementation import (
     IMPLEMENTATION_DIR,
@@ -48,6 +48,8 @@ def check_readiness(
     for type_key, meta in ARTIFACT_TYPES.items():
         path = app / meta["filename"]
         if not path.is_file():
+            if type_key in OPTIONAL_ARTIFACT_TYPES:
+                continue
             findings.append(ImplementationFinding("error", path.name, f"required {type_key} artifact is missing", "artifact-missing"))
             continue
         try:

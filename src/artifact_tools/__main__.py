@@ -8,6 +8,7 @@ import sys
 
 from artifact_tools.adr import create_adr, init_adr_dir
 from artifact_tools.changelog import add_changelog
+from artifact_tools.config import ConfigError, apply_workspace_config
 from artifact_tools.constants import ARTIFACT_TYPES
 from artifact_tools.diagrams import render_dir
 from artifact_tools.implementation import (
@@ -420,6 +421,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Artifact types from aegis.config.yaml must be registered before the parser lists them.
+    try:
+        apply_workspace_config()
+    except ConfigError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     parser = build_parser()
     args = parser.parse_args(argv)
     return args.func(args)

@@ -24,6 +24,14 @@ own `aegis/skills/.../templates` folders, those are used instead.
 
 In the examples, `<app>` is an application folder such as `docs/artifacts/customer-portal`.
 
+## Configuration
+
+The CLI reads an optional `aegis.config.yaml` that can add artifact types. It uses the
+file named by the `AEGIS_CONFIG` environment variable, or else the nearest
+`aegis.config.yaml` in the current folder or a parent. Without one, the CLI knows only the
+built-in types. An invalid config stops every command with exit code 2. See
+[Customizing AEGIS](customizing.md#extra-artifact-types).
+
 ## Artifacts
 
 ### `scaffold`
