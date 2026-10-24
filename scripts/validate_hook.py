@@ -64,9 +64,17 @@ def main(argv: list[str] | None = None) -> int:
 
     sys.path.insert(0, str(SCRIPT_ROOT / "src"))
     try:
+        from artifact_tools.config import ConfigError, apply_workspace_config
         from artifact_tools.validate import validate_dir
     except Exception:
         return 0  # tooling not importable; stay out of the way
+
+    # Artifact types added by the repository's aegis.config.yaml.
+    try:
+        apply_workspace_config(artifact_dir.parent.parent)
+    except ConfigError as exc:
+        print(json.dumps(hook_output(f"AEGIS could not read its config, so artifacts were not validated: {exc}", args.platform)))
+        return 0
 
     issues = validate_dir(artifact_dir)
     errors = [i for i in issues if i.severity == "error"]

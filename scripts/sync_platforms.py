@@ -19,10 +19,15 @@ In Claude Code, orchestrators run in the main conversation: each prompt that tar
 orchestrator becomes a skill that loads the orchestrator's role, so it can talk to the
 user and delegate to specialist subagents.
 
+An optional ``aegis.config.yaml`` at the repository root changes the plugin identity and
+the standards server name, and adds an overlay folder whose agents, prompts and skills
+are merged on top of ``aegis/``. See docs/customizing.md.
+
 Usage::
 
     python scripts/sync_platforms.py            # write the generated files
     python scripts/sync_platforms.py --check    # exit 1 if any generated file is stale
+    python scripts/sync_platforms.py --config path/to/aegis.config.yaml
 """
 
 from __future__ import annotations
@@ -38,13 +43,25 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "src"))
+
+from artifact_tools.config import (  # noqa: E402
+    CONFIG_FILENAME,
+    DEFAULT_CONFIG,
+    DEFAULT_PLUGIN_NAME,
+    DEFAULT_STANDARDS_SERVER,
+    AegisConfig,
+    ConfigError,
+    load_config,
+)
+
 SOURCE = Path("aegis")
 
 GENERATED_NOTE = "Generated from {source} by scripts/sync_platforms.py. Edit the source, not this file."
 
-# Neutral tool names (Copilot vocabulary) and their Claude Code equivalents.
+# Neutral tool names (Copilot vocabulary) and their Claude Code equivalents. The
+# standards tool maps to the configured MCP server (standards.server in the config).
 STANDARDS_TOOL = "standards"
-COPILOT_STANDARDS_TOOL = "enterprise-standards-server/*"
 CLAUDE_TOOLS = {
     "read": ["Read"],
     "search": ["Grep", "Glob"],
@@ -52,8 +69,12 @@ CLAUDE_TOOLS = {
     "execute": ["Bash"],
     "agent": ["Agent"],
     "todo": [],
-    STANDARDS_TOOL: ["mcp__enterprise-standards-server"],
+    STANDARDS_TOOL: [],
 }
+
+# Mentions of the default server name in agent, prompt, skill and rules text. Paths such
+# as examples/enterprise-standards-server are left alone.
+_SERVER_MENTION_RE = re.compile(rf"(?<![\w./-]){re.escape(DEFAULT_STANDARDS_SERVER)}(?![\w-])")
 
 _FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
 
@@ -90,9 +111,56 @@ def _split(path: Path) -> tuple[dict, str]:
     return yaml.safe_load(match.group(1)) or {}, match.group(2)
 
 
-def load_agents(root: Path) -> dict[str, Agent]:
+def _scan(base: Path) -> dict[str, Path]:
+    """Agent, prompt and skill sources under `base`, keyed by path relative to it."""
+    found = {}
+    for kind in ("agents", "prompts"):
+        for path in sorted((base / kind).glob("*.md")):
+            found[f"{kind}/{path.name}"] = path
+    skills = base / "skills"
+    if skills.is_dir():
+        for path in sorted(p for p in skills.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
+            found[f"skills/{path.relative_to(skills).as_posix()}"] = path
+    return found
+
+
+def source_tree(root: Path, config: AegisConfig = DEFAULT_CONFIG) -> dict[str, Path]:
+    """Every source file, keyed by its path relative to ``aegis/`` (``agents/<name>.md``).
+
+    Overlay files are merged on top of ``aegis/``. An overlay file at the same path as a
+    core file replaces it only when ``overlay.overrides`` lists that path; otherwise it is
+    an error, so a core file is never shadowed by accident. Every override must replace a
+    core file, so a stale entry is caught when the core file is renamed or removed.
+    """
+    tree = _scan(root / SOURCE)
+    overlay = config.overlay
+    if overlay is None:
+        return tree
+    overrides = set(overlay.overrides)
+    replaced = set()
+    where = overlay.path.relative_to(root).as_posix()
+    for rel, path in _scan(overlay.path).items():
+        if rel in tree:
+            if rel not in overrides:
+                raise ValueError(
+                    f"{where}/{rel} shadows {SOURCE.as_posix()}/{rel}. Rename it, or list "
+                    f"{rel!r} under overlay.overrides in {CONFIG_FILENAME} to replace the core file."
+                )
+            replaced.add(rel)
+        tree[rel] = path
+    unused = sorted(overrides - replaced)
+    if unused:
+        raise ValueError(
+            f"overlay.overrides in {CONFIG_FILENAME} lists {', '.join(unused)}, but no overlay "
+            "file replaces a core file at that path"
+        )
+    return dict(sorted(tree.items()))
+
+
+def load_agents(root: Path, tree: dict[str, Path] | None = None) -> dict[str, Agent]:
+    tree = source_tree(root) if tree is None else tree
     agents = {}
-    for path in sorted((root / SOURCE / "agents").glob("*.md")):
+    for path in (path for rel, path in tree.items() if rel.startswith("agents/")):
         fm, body = _split(path)
         name = fm["name"]
         if name != path.stem:
@@ -119,9 +187,10 @@ def load_agents(root: Path) -> dict[str, Agent]:
     return agents
 
 
-def load_prompts(root: Path, agents: dict[str, Agent]) -> dict[str, Prompt]:
+def load_prompts(root: Path, agents: dict[str, Agent], tree: dict[str, Path] | None = None) -> dict[str, Prompt]:
+    tree = source_tree(root) if tree is None else tree
     prompts = {}
-    for path in sorted((root / SOURCE / "prompts").glob("*.md")):
+    for path in (path for rel, path in tree.items() if rel.startswith("prompts/")):
         fm, body = _split(path)
         if fm["name"] != path.stem:
             raise ValueError(f"{path}: name {fm['name']!r} must match the file name")
@@ -150,8 +219,8 @@ def _note(source: str) -> str:
     return f"# {GENERATED_NOTE.format(source=source)}"
 
 
-def copilot_agent(agent: Agent, agents: dict[str, Agent]) -> str:
-    tools = ", ".join(f"'{COPILOT_STANDARDS_TOOL}'" if t == STANDARDS_TOOL else t for t in agent.tools)
+def copilot_agent(agent: Agent, agents: dict[str, Agent], config: AegisConfig = DEFAULT_CONFIG) -> str:
+    tools = ", ".join(f"'{config.standards_server}/*'" if t == STANDARDS_TOOL else t for t in agent.tools)
     lines = [
         "---",
         _note(agent.source),
@@ -183,10 +252,11 @@ def copilot_prompt(prompt: Prompt, agents: dict[str, Agent]) -> str:
     return "\n".join(lines) + "\n" + prompt.body
 
 
-def _claude_tools(agent: Agent) -> str:
+def _claude_tools(agent: Agent, config: AegisConfig) -> str:
     names: list[str] = []
     for tool in agent.tools:
-        for name in CLAUDE_TOOLS[tool]:
+        mapped = [f"mcp__{config.standards_server}"] if tool == STANDARDS_TOOL else CLAUDE_TOOLS[tool]
+        for name in mapped:
             if name not in names:
                 names.append(name)
     return ", ".join(names)
@@ -203,13 +273,13 @@ CLAUDE_SPECIALIST_PREAMBLE = """\
 """
 
 
-def claude_agent(agent: Agent) -> str:
+def claude_agent(agent: Agent, config: AegisConfig = DEFAULT_CONFIG) -> str:
     lines = [
         "---",
         _note(agent.source),
         f"name: {agent.name}",
         f"description: {_q(agent.description)}",
-        f"tools: {_claude_tools(agent)}",
+        f"tools: {_claude_tools(agent, config)}",
         "---",
     ]
     return "\n".join(lines) + "\n" + CLAUDE_SPECIALIST_PREAMBLE + agent.body
@@ -220,12 +290,16 @@ def _inline_links(body: str) -> str:
     return body.replace("](../skills/", "](../")
 
 
-PLUGIN_NAME = "aegis"
-PLUGIN_DIR = f"plugins/{PLUGIN_NAME}"
-PLUGIN_AGENT_NOTE = (
-    f"In a plugin install the subagents are listed with the `{PLUGIN_NAME}:` prefix, for "
-    f"example `{PLUGIN_NAME}:artifact-manager`."
-)
+def plugin_dir(config: AegisConfig = DEFAULT_CONFIG) -> str:
+    return f"plugins/{config.plugin.name}"
+
+
+def _plugin_agent_note(config: AegisConfig) -> str:
+    name = config.plugin.name
+    return (
+        f"In a plugin install the subagents are listed with the `{name}:` prefix, for "
+        f"example `{name}:artifact-manager`."
+    )
 
 
 def _rules_line(plugin: bool) -> str:
@@ -236,9 +310,11 @@ def _rules_line(plugin: bool) -> str:
     )
 
 
-def _orchestrator_preamble(agent: Agent, agents: dict[str, Agent], plugin: bool = False) -> str:
+def _orchestrator_preamble(
+    agent: Agent, agents: dict[str, Agent], plugin: bool = False, config: AegisConfig = DEFAULT_CONFIG
+) -> str:
     specialists = ", ".join(f"`{h['agent']}`" for h in agent.handoffs)
-    plugin_note = f"\n  {PLUGIN_AGENT_NOTE}" if plugin else ""
+    plugin_note = f"\n  {_plugin_agent_note(config)}" if plugin else ""
     return f"""\
 ## How to run this in Claude Code
 
@@ -256,7 +332,9 @@ to the user directly and delegate specialist work to subagents.
 """
 
 
-def claude_prompt_skill(prompt: Prompt, agents: dict[str, Agent], plugin: bool = False) -> str:
+def claude_prompt_skill(
+    prompt: Prompt, agents: dict[str, Agent], plugin: bool = False, config: AegisConfig = DEFAULT_CONFIG
+) -> str:
     target = agents[prompt.agent]
     lines = [
         "---",
@@ -271,8 +349,8 @@ def claude_prompt_skill(prompt: Prompt, agents: dict[str, Agent], plugin: bool =
     request = f"## This request\n\n{prompt.body.strip()}\n\nArguments from the user: $ARGUMENTS\n"
     if target.role == "orchestrator":
         role = f"## Your role: {target.title}\n\n{_inline_links(target.body).strip()}\n\n"
-        return header + _orchestrator_preamble(target, agents, plugin) + role + request
-    plugin_note = f"\n{PLUGIN_AGENT_NOTE}" if plugin else ""
+        return header + _orchestrator_preamble(target, agents, plugin, config) + role + request
+    plugin_note = f"\n{_plugin_agent_note(config)}" if plugin else ""
     delegate = f"""\
 ## How to run this in Claude Code
 
@@ -301,11 +379,6 @@ def copilot_instructions(text: str) -> str:
 
 
 PLUGIN_SCRIPTS = ("implementation_guard.py", "validate_hook.py", "session_start.py")
-REPO_URL = "https://github.com/nishant-tamilselvan/AEGIS"
-PLUGIN_DESCRIPTION = (
-    "Agents that turn an idea into approved requirements, an implementable architecture and "
-    "reviewed code, grounded in your enterprise standards."
-)
 
 
 def package_version(root: Path) -> str:
@@ -319,28 +392,39 @@ def _json(data: dict) -> str:
     return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
 
 
-def plugin_manifest(version: str) -> str:
+def plugin_manifest(version: str, config: AegisConfig = DEFAULT_CONFIG) -> str:
+    plugin = config.plugin
     return _json({
-        "name": PLUGIN_NAME,
+        "name": plugin.name,
         "version": version,
-        "description": PLUGIN_DESCRIPTION,
-        "author": {"name": "Nishant Tamilselvan"},
-        "homepage": REPO_URL,
-        "repository": REPO_URL,
+        "description": plugin.description,
+        "author": {"name": plugin.author},
+        "homepage": plugin.repo_url,
+        "repository": plugin.repo_url,
         "license": "MIT",
         "keywords": ["sdlc", "requirements", "architecture", "adr", "agents"],
     })
 
 
-def marketplace_manifest() -> str:
+def marketplace_manifest(config: AegisConfig = DEFAULT_CONFIG) -> str:
+    plugin = config.plugin
     return _json({
-        "name": PLUGIN_NAME,
-        "description": f"AEGIS: {PLUGIN_DESCRIPTION[0].lower()}{PLUGIN_DESCRIPTION[1:]}",
-        "owner": {"name": "Nishant Tamilselvan"},
+        "name": plugin.name,
+        "description": f"AEGIS: {plugin.description[0].lower()}{plugin.description[1:]}",
+        "owner": {"name": plugin.author},
         "plugins": [
-            {"name": PLUGIN_NAME, "source": f"./{PLUGIN_DIR}", "description": PLUGIN_DESCRIPTION},
+            {"name": plugin.name, "source": f"./{plugin_dir(config)}", "description": plugin.description},
         ],
     })
+
+
+def marketplace_source(config: AegisConfig = DEFAULT_CONFIG) -> str:
+    """What ``/plugin marketplace add`` takes: ``owner/repo`` on GitHub, else the URL."""
+    url = config.plugin.repo_url
+    github = "https://github.com/"
+    if url.startswith(github) and url[len(github):].count("/") == 1:
+        return url[len(github):].removesuffix(".git")
+    return url
 
 
 def plugin_hooks() -> str:
@@ -367,18 +451,19 @@ def plugin_hooks() -> str:
     })
 
 
-def plugin_readme(version: str) -> str:
+def plugin_readme(version: str, config: AegisConfig = DEFAULT_CONFIG) -> str:
+    plugin = config.plugin
     return f"""<!-- {GENERATED_NOTE.format(source="scripts/sync_platforms.py")} -->
 
 # AEGIS plugin for Claude Code (v{version})
 
-{PLUGIN_DESCRIPTION}
+{plugin.description}
 
 ## Install
 
 ```text
-/plugin marketplace add nishant-tamilselvan/AEGIS
-/plugin install aegis@aegis
+/plugin marketplace add {marketplace_source(config)}
+/plugin install {plugin.name}@{plugin.name}
 ```
 
 The agents call the AEGIS CLI, so install it for the Python on your PATH:
@@ -389,34 +474,49 @@ pip install aegis-sdlc
 
 ## Use
 
-Run `/aegis:start-ideation <app-name> <idea>` in your repository. Artifacts are written to
+Run `/{plugin.name}:start-ideation <app-name> <idea>` in your repository. Artifacts are written to
 `docs/artifacts/<app-name>/` in that repository. See the
-[Claude Code plugin guide]({REPO_URL}/blob/main/docs/claude-code-plugin.md).
+[Claude Code plugin guide]({plugin.repo_url}/blob/main/docs/claude-code-plugin.md).
 """
 
 
-def planned_files(root: Path) -> dict[Path, bytes]:
+def rules_text(root: Path, config: AegisConfig = DEFAULT_CONFIG) -> str:
+    """The golden rules: ``aegis/instructions.md``, then the overlay's ``instructions.md``.
+
+    Overlay rules are appended. They add to the core rules and never replace them.
+    """
+    text = (root / SOURCE / "instructions.md").read_text(encoding="utf-8")
+    extra = config.overlay.path / "instructions.md" if config.overlay is not None else None
+    if extra is not None and extra.is_file():
+        text = text.rstrip("\n") + "\n\n" + extra.read_text(encoding="utf-8").lstrip("\n")
+    return text
+
+
+def planned_files(root: Path, config: AegisConfig = DEFAULT_CONFIG) -> dict[Path, bytes]:
     """Every generated path (relative to root) and its exact content."""
-    agents = load_agents(root)
-    prompts = load_prompts(root, agents)
+    tree = source_tree(root, config)
+    agents = load_agents(root, tree)
+    prompts = load_prompts(root, agents, tree)
+    plugin = plugin_dir(config)
     files: dict[Path, bytes] = {}
 
     def put(path: str, text: str) -> None:
         files[Path(path)] = text.encode("utf-8")
 
     for agent in agents.values():
-        put(f".github/agents/{agent.name}.agent.md", copilot_agent(agent, agents))
+        put(f".github/agents/{agent.name}.agent.md", copilot_agent(agent, agents, config))
         if agent.role == "specialist":
-            put(f".claude/agents/{agent.name}.md", claude_agent(agent))
-            put(f"{PLUGIN_DIR}/agents/{agent.name}.md", claude_agent(agent))
+            put(f".claude/agents/{agent.name}.md", claude_agent(agent, config))
+            put(f"{plugin}/agents/{agent.name}.md", claude_agent(agent, config))
     for prompt in prompts.values():
         put(f".github/prompts/{prompt.name}.prompt.md", copilot_prompt(prompt, agents))
-        put(f".claude/skills/{prompt.name}/SKILL.md", claude_prompt_skill(prompt, agents))
-        put(f"{PLUGIN_DIR}/skills/{prompt.name}/SKILL.md", claude_prompt_skill(prompt, agents, plugin=True))
+        put(f".claude/skills/{prompt.name}/SKILL.md", claude_prompt_skill(prompt, agents, config=config))
+        put(f"{plugin}/skills/{prompt.name}/SKILL.md", claude_prompt_skill(prompt, agents, plugin=True, config=config))
 
-    skills_root = root / SOURCE / "skills"
-    for path in sorted(p for p in skills_root.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
-        rel = path.relative_to(skills_root)
+    for key, path in tree.items():
+        if not key.startswith("skills/"):
+            continue
+        rel = Path(key).relative_to("skills")
         source = path.relative_to(root).as_posix()
         data = _lf(path.read_bytes())
         if path.name == "SKILL.md":
@@ -425,37 +525,49 @@ def planned_files(root: Path) -> dict[Path, bytes]:
             files[Path(target) / rel] = data
         # The plugin has no docs/ or repository config, so links that climb out of the
         # skill folder point at the repository on GitHub instead.
-        files[Path(PLUGIN_DIR) / "skills" / rel] = (
-            data.replace(b"](../../../", f"]({REPO_URL}/blob/main/".encode()) if path.suffix == ".md" else data
+        files[Path(plugin) / "skills" / rel] = (
+            data.replace(b"](../../../", f"]({config.plugin.repo_url}/blob/main/".encode())
+            if path.suffix == ".md" else data
         )
         if rel.parts[0] in prompts:
             raise ValueError(f"skill {rel.parts[0]!r} collides with a prompt of the same name")
 
-    instructions = (root / SOURCE / "instructions.md").read_text(encoding="utf-8")
+    instructions = rules_text(root, config)
     put(".github/copilot-instructions.md", copilot_instructions(instructions))
 
     # Claude Code plugin (see docs/claude-code-plugin.md).
     version = package_version(root)
-    put(".claude-plugin/marketplace.json", marketplace_manifest())
-    put(f"{PLUGIN_DIR}/.claude-plugin/plugin.json", plugin_manifest(version))
-    put(f"{PLUGIN_DIR}/hooks/hooks.json", plugin_hooks())
-    put(f"{PLUGIN_DIR}/README.md", plugin_readme(version))
-    put(f"{PLUGIN_DIR}/instructions.md", instructions)
+    put(".claude-plugin/marketplace.json", marketplace_manifest(config))
+    put(f"{plugin}/.claude-plugin/plugin.json", plugin_manifest(version, config))
+    put(f"{plugin}/hooks/hooks.json", plugin_hooks())
+    put(f"{plugin}/README.md", plugin_readme(version, config))
+    put(f"{plugin}/instructions.md", instructions)
     for name in PLUGIN_SCRIPTS:
-        files[Path(PLUGIN_DIR) / "scripts" / name] = _lf((root / "scripts" / name).read_bytes())
+        files[Path(plugin) / "scripts" / name] = _lf((root / "scripts" / name).read_bytes())
     # The hooks run from the plugin folder, so they carry their own artifact_tools copy.
     # The agents use the installed aegis-sdlc CLI instead.
     for path in sorted((root / "src" / "artifact_tools").glob("*.py")):
-        files[Path(PLUGIN_DIR) / "src" / "artifact_tools" / path.name] = _lf(path.read_bytes())
+        files[Path(plugin) / "src" / "artifact_tools" / path.name] = _lf(path.read_bytes())
+
+    # The agents and skills name the standards server in prose as well as in their tools.
+    if config.standards_server != DEFAULT_STANDARDS_SERVER:
+        for rel, data in files.items():
+            if rel.suffix == ".md":
+                files[rel] = _SERVER_MENTION_RE.sub(config.standards_server, data.decode("utf-8")).encode("utf-8")
     return files
 
 
-# Directories whose contents this script owns entirely.
-OWNED_DIRS = (
-    ".github/agents", ".github/prompts", ".github/skills",
-    ".claude/agents", ".claude/skills",
-    ".claude-plugin", PLUGIN_DIR,
-)
+def owned_dirs(config: AegisConfig = DEFAULT_CONFIG) -> tuple[str, ...]:
+    """Directories whose contents this script owns entirely.
+
+    The default plugin folder stays owned when the plugin is renamed, so it is removed.
+    """
+    dirs = (
+        ".github/agents", ".github/prompts", ".github/skills",
+        ".claude/agents", ".claude/skills",
+        ".claude-plugin", f"plugins/{DEFAULT_PLUGIN_NAME}",
+    )
+    return dirs if config.plugin.name == DEFAULT_PLUGIN_NAME else (*dirs, plugin_dir(config))
 
 
 _NUL = bytes([0])
@@ -470,7 +582,9 @@ def _lf(data: bytes) -> bytes:
     return data.replace(_CRLF, _LF)
 
 
-def stale_files(root: Path, files: dict[Path, bytes]) -> tuple[list[Path], list[Path]]:
+def stale_files(
+    root: Path, files: dict[Path, bytes], owned: tuple[str, ...] | None = None
+) -> tuple[list[Path], list[Path]]:
     """(paths whose content differs or is missing, generated-dir paths that should not exist).
 
     Line endings are ignored: a Windows checkout with core.autocrlf may hold CRLF copies of
@@ -481,8 +595,8 @@ def stale_files(root: Path, files: dict[Path, bytes]) -> tuple[list[Path], list[
         if not (root / rel).is_file() or _lf((root / rel).read_bytes()) != _lf(data)
     ]
     extra = []
-    for owned in OWNED_DIRS:
-        base = root / owned
+    for directory in owned or owned_dirs():
+        base = root / directory
         if base.is_dir():
             for path in base.rglob("*"):
                 rel = path.relative_to(root)
@@ -491,9 +605,9 @@ def stale_files(root: Path, files: dict[Path, bytes]) -> tuple[list[Path], list[
     return sorted(changed), sorted(extra)
 
 
-def write(root: Path, files: dict[Path, bytes]) -> None:
-    for owned in OWNED_DIRS:
-        shutil.rmtree(root / owned, ignore_errors=True)
+def write(root: Path, files: dict[Path, bytes], owned: tuple[str, ...] | None = None) -> None:
+    for directory in owned or owned_dirs():
+        shutil.rmtree(root / directory, ignore_errors=True)
     for rel, data in files.items():
         target = root / rel
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -503,12 +617,25 @@ def write(root: Path, files: dict[Path, bytes]) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="Report stale generated files and exit 1; write nothing.")
+    parser.add_argument(
+        "--config", type=Path, default=None,
+        help=f"Config file to use. Default: {CONFIG_FILENAME} in the repository root, if present.",
+    )
     parser.add_argument("--root", type=Path, default=REPO_ROOT, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     root = args.root.resolve()
 
-    files = planned_files(root)
-    changed, extra = stale_files(root, files)
+    config_path = args.config if args.config is not None else root / CONFIG_FILENAME
+    try:
+        if not config_path.is_file() and args.config is not None:
+            raise ConfigError(f"{config_path} does not exist")
+        config = load_config(config_path if config_path.is_file() else None, root=root)
+        files = planned_files(root, config)
+    except (ConfigError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    owned = owned_dirs(config)
+    changed, extra = stale_files(root, files, owned)
     if args.check:
         for rel in changed:
             print(f"stale: {rel.as_posix()}")
@@ -519,7 +646,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(f"{len(files)} generated files are up to date.", file=sys.stderr)
         return 0
-    write(root, files)
+    write(root, files, owned)
     print(f"Wrote {len(files)} files ({len(changed)} changed, {len(extra)} removed).", file=sys.stderr)
     return 0
 

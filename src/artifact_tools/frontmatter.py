@@ -7,22 +7,46 @@ from pathlib import Path
 
 import yaml
 
+from artifact_tools.constants import ARTIFACT_TYPES
+
 _FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n?(.*)$", re.DOTALL)
+
+
+class _IdPattern:
+    """A compiled regex over the artifact id prefixes, rebuilt when that set changes.
+
+    Artifact types added by ``aegis.config.yaml`` register new prefixes at run time.
+    Other modules import these patterns by name, so the object stays the same and only
+    the compiled pattern behind it is replaced.
+    """
+
+    def __init__(self, template: str, flags: int = 0):
+        self._template = template
+        self._flags = flags
+        self._prefixes: tuple[str, ...] | None = None
+        self._compiled: re.Pattern[str] | None = None
+
+    def _pattern(self) -> re.Pattern[str]:
+        prefixes = tuple(meta["prefix"] for meta in ARTIFACT_TYPES.values())
+        if prefixes != self._prefixes:
+            self._compiled = re.compile(self._template.replace("{prefixes}", "|".join(prefixes)), self._flags)
+            self._prefixes = prefixes
+        return self._compiled
+
+    def __getattr__(self, name: str):
+        return getattr(self._pattern(), name)
+
 
 # Matches an id token such as FR-014, RISK-002, SEC-003 or ADR-0004.
 # The `(?<!STD-)` lookbehind prevents external Enterprise Standards citations
 # (e.g. ENT-STD-SEC-001, ENT-STD-OBS-002) from being misread as internal artifact
 # ids like SEC-001 or OBS-002.
-ID_TOKEN_RE = re.compile(
-    r"(?<!STD-)\b(PR|FR|NFR|UJ|BP|RISK|IF|DM|SEC|DEP|OBS|ADR)-(\d{3,})\b"
-)
+ID_TOKEN_RE = _IdPattern(r"(?<!STD-)\b({prefixes}|ADR)-(\d{3,})\b")
 
 # Matches an id that starts a Markdown table row cell: "| FR-001 | ..."
 # ADR ids are defined in the ADR index (a subfolder) and validated separately, so
 # they are intentionally excluded here to keep them out of the top-level id scan.
-DEFINED_ID_RE = re.compile(
-    r"^\|\s*((?:PR|FR|NFR|UJ|BP|RISK|IF|DM|SEC|DEP|OBS)-\d{3,})\s*\|", re.MULTILINE
-)
+DEFINED_ID_RE = _IdPattern(r"^\|\s*((?:{prefixes})-\d{3,})\s*\|", re.MULTILINE)
 
 
 class FrontmatterError(ValueError):

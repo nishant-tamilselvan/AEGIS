@@ -7,6 +7,25 @@ may include breaking changes; they are listed under **Changed**.
 
 ## [Unreleased]
 
+### Added
+
+- An optional `aegis.config.yaml` lets an organization run its own edition of AEGIS as a
+  thin overlay instead of editing core files. Without the file, everything works as
+  before. See [Customizing AEGIS](docs/customizing.md).
+
+  | Key | What it changes |
+  | --- | --- |
+  | `plugin` | The Claude Code plugin's name, description, author and repository URL. |
+  | `overlay` | A folder of agents, prompts, skills and extra golden rules merged on top of `aegis/`. An overlay file that shadows a core file is an error unless `overlay.overrides` lists it. |
+  | `standards` | The MCP server name the agents call for Enterprise Standards. |
+  | `artifact_types` | Extra artifact types with their own id prefix and template. The CLI scaffolds, validates and checks them for readiness. |
+
+- `sync_platforms.py --config <path>` uses a config file other than the one at the
+  repository root.
+- The CLI reads the config named by the `AEGIS_CONFIG` environment variable, or the
+  nearest `aegis.config.yaml` above the current folder. An invalid config exits with
+  code 2.
+
 ## [0.2.0] - 2026-09-28
 
 A writing-style skill that keeps artifacts in plain prose, and a link to the Enterprise AI

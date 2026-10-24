@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 # Canonical artifact type -> metadata.
 # `prefix` is the id prefix a document of this type is allowed to *define*.
 ARTIFACT_TYPES: dict[str, dict[str, str]] = {
@@ -62,6 +64,14 @@ ARTIFACT_TYPES: dict[str, dict[str, str]] = {
     },
 }
 
+# Templates for artifact types added by aegis.config.yaml (see artifact_tools.config).
+# Built-in types use the templates folder instead.
+ARTIFACT_TEMPLATES: dict[str, Path] = {}
+
+# Types the implementation readiness gate does not require. Only configured types can be
+# optional; every built-in type is required.
+OPTIONAL_ARTIFACT_TYPES: set[str] = set()
+
 # Convenience aliases accepted on the command line.
 TYPE_ALIASES: dict[str, str] = {
     "prd": "product-requirements",
@@ -96,7 +106,7 @@ TYPE_ALIASES: dict[str, str] = {
     "telemetry": "observability-strategy",
 }
 
-# All recognised id prefixes across the artifact set.
+# All recognised id prefixes across the artifact set. Configured types append theirs.
 ALL_PREFIXES: tuple[str, ...] = (
     "PR",
     "FR",
